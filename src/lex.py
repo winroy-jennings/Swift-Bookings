@@ -7,8 +7,6 @@ import calendar
 reserved = {
     # Commands
     "Book": "KEYWORD_BOOK",
-    "Ticket": "KEYWORD_TICKET",
-    "Tickets": "KEYWORD_TICKETS",
     "Confirm": "KEYWORD_CONFIRM",
     "Pay": "KEYWORD_PAY",
     "Cancel": "KEYWORD_CANCEL",
@@ -18,9 +16,12 @@ reserved = {
     "Help": "KEYWORD_HELP",
     "Exit": "KEYWORD_EXIT",
     # Reserved words
+    "ticket": "KEYWORD_TICKET",
+    "tickets": "KEYWORD_TICKETS",
     "reservation": "RESERVATION",
     "reservations": "RESERVATIONS",
     "schedule": "SCHEDULE",
+    "schedules": "SCHEDULES",
     "from": "FROM",
     "to": "TO",
     "on": "ON",
@@ -119,7 +120,6 @@ def t_error(t):
 # Build the lexer
 lexer = lex.lex()
 
-
 # Map of months to their corresponding numbers
 months = {
     "January": 1,
@@ -169,17 +169,14 @@ def p_identifier_list(p):
     else:
         p[0] = p[1]
 
-    if len(p) == 3:
-        p[0] = f"{p[1]} {p[2]}"  # Accumulate identifiers
-
 
 # Example commands
-# Book Ticket for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 8:30 AM for Joy Reynolds.
-# Book 2 Tickets for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 8:30 AM for Joy Reynolds.
+# Book ticket for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 8:30 AM for Joy Reynolds.
+# Book 2 tickets for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 8:30 AM for Joy Reynolds.
 
 # Testing the date validation
-# Book 2 Tickets for Knutsford Express from Montego Bay to Kingston on February 29, 2025 at 8:30 AM for Joy Reynolds.
-# Book 2 Tickets for Knutsford Express from Montego Bay to Kingston on February 29, 2025 at 8:30 AM for Joy Reynolds.
+# Book 2 tickets for Knutsford Express from Montego Bay to Kingston on February 29, 2025 at 8:30 AM for Joy Reynolds.
+# Book 2 tickets for Knutsford Express from Montego Bay to Kingston on February 29, 2025 at 8:30 AM for Joy Reynolds.
 
 
 def p_book_command(p):
@@ -210,7 +207,7 @@ def p_book_command(p):
                 )
             else:
                 p[0] = (
-                    f"Booking {p[2]} tickets for {p[5]} from {p[7]} to {p[9]} on {p[11]} at {p[13]} for {p[15]}."
+                    f"Book {p[2]} tickets for {p[5]} from {p[7]} to {p[9]} on {p[11]} at {p[13]} for {p[15]}."
                 )
     # The user only wants on ticket
     else:
@@ -233,13 +230,16 @@ def p_book_command(p):
                 )
             else:
                 p[0] = (
-                    f"Booking a ticket for {p[2]} from {p[4]} to {p[6]} on {p[8]} at {p[10]} for {p[12]}."
+                    f"Book a ticket for {p[2]} from {p[4]} to {p[6]} on {p[8]} at {p[10]} for {p[12]}."
                 )
 
 
 # Examples:
 #  Confirm reservation for Knutsford Express for Joy Reynolds.
 #  Confirm 3 reservations for Knutsford Express for Joy Reynolds.
+
+# Testing error handling
+#  Confirm -3 reservations for Knutsford Express for Joy Reynolds.
 
 
 def p_confirm_command(p):
@@ -254,64 +254,157 @@ def p_confirm_command(p):
                 "Error: The number of reservations MUST be a positive number. Great than 0!"
             )
         else:
-            p[0] = f"Confirming {p[2]} reservations for {p[5]} for {p[7]}."
+            p[0] = f"Confirm {p[2]} reservations for {p[5]} for {p[7]}."
     else:
-        p[0] = f"Confirming reservation for {p[4]} for {p[6]}."
+        p[0] = f"Confirm reservation for {p[4]} for {p[6]}."
 
-    # Examples:
-    #  Pay reservation for Knutsford Express for Joy Reynolds.
+
+# Examples:
+#  Pay reservation for Knutsford Express for Joy Reynolds.
+#  Pay 3 reservations for Knutsford Express for Joy Reynolds.
+
+# Testing error handling
+#  Pay -3 reservations for Knutsford Express for Joy Reynolds.
 
 
 def p_pay_command(p):
-    """pay_command : KEYWORD_PAY RESERVATION FOR identifier_list FOR identifier_list SYM_END"""
+    """
+    pay_command : KEYWORD_PAY RESERVATION FOR identifier_list FOR identifier_list SYM_END
+                | KEYWORD_PAY INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END
+    """
 
-    p[0] = f"Paying reservation for {p[4]} for {p[6]}."
+    if type(p[2]) is int:
+        if p[2] < 1:
+            print(
+                "Error: The number of reservations MUST be a positive number. Great than 0!"
+            )
+        else:
+            p[0] = f"Pay {p[2]} reservations for {p[5]} for {p[7]}."
+    else:
+        p[0] = f"Pay reservation for {p[4]} for {p[6]}."
+
+
+# Examples:
+#  Cancel reservation for Knutsford Express for Joy Reynolds.
+#  Cancel 3 reservations for Knutsford Express for Joy Reynolds.
+
+# Testing error handling
+#  Cancel -3 reservations for Knutsford Express for Joy Reynolds.
 
 
 # Cancel reservations for a particular person.
 def p_cancel_command(p):
-    """cancel_command : KEYWORD_CANCEL RESERVATION FOR identifier_list FOR identifier_list SYM_END"""
+    """
+    cancel_command : KEYWORD_CANCEL RESERVATION FOR identifier_list FOR identifier_list SYM_END
+                    | KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END
+    """
 
-    p[0] = f"Cancelling reservation for {p[4]} for {p[6]}."
+    if type(p[2]) is int:
+        if p[2] < 1:
+            print(
+                "Error: The number of reservations MUST be a positive number. Great than 0!"
+            )
+        else:
+            p[0] = f"Cancel {p[2]} reservations for {p[5]} for {p[7]}."
+    else:
+        p[0] = f"Cancel reservation for {p[4]} for {p[6]}."
+
+
+# Examples:
+#  List Knutsford Express schedule.
+#  List Knutsford Express schedules.
 
 
 # List all the available schedules from a hotel/company.
 def p_list_command(p):
     """
     list_command : KEYWORD_LIST identifier_list SCHEDULE SYM_END
+                | KEYWORD_LIST identifier_list SCHEDULES SYM_END
     """
 
-    p[0] = f"List of available schedules for {p[2]}"
+    if p[3] == "schedule":
+        p[0] = f"List available schedule for {p[2]}."
+    else:
+        p[0] = f"List available schedules for {p[2]}."
+
+
+# Examples:
+#  View schedule for Joy Reynolds.
+#  View schedules for Joy Reynolds.
 
 
 # Displays all the current schedules for a person.
 def p_view_command(p):
-    """view_command : KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END"""
+    """
+    view_command : KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END
+                | KEYWORD_VIEW SCHEDULES FOR identifier_list SYM_END
+    """
 
-    p[0] = f"Viewing current schedules for {p[4]}."
+    if p[2] == "schedule":
+        p[0] = f"View schedule for {p[4]}."
+    else:
+        p[0] = f"View schedules for {p[4]}."
+
+
+# Examples:
+#  History for Joy Reynolds.
 
 
 # Views all the schedules for a person.
 def p_history_command(p):
-    """history_command : KEYWORD_HISTORY FOR identifier_list SYM_END"""
-    p[0] = f"Viewing history for {p[3]}"
+    """
+    history_command : KEYWORD_HISTORY FOR identifier_list SYM_END
+    """
+
+    p[0] = f"History for {p[3]}."
 
 
 def p_help_command(p):
-    """help_command : KEYWORD_HELP SYM_END"""
+    """
+    help_command : KEYWORD_HELP SYM_END
+    """
 
-    p[0] = (
-        "Displaying help information:\n"
-        "  book_command: book <identifiers> from <identifiers> to <identifiers> on <date> at <time> for <identifiers>.\n"
-        "  confirm_command: confirm reservation for <identifiers> for <identifiers>.\n"
-        "  pay_command: pay reservation for <identifiers> for <identifiers>.\n"
-        "  cancel_command: cancel reservation for <identifiers> for <identifiers>.\n"
-        "  list_command: list <identifiers> schedule.\n"
-        "  view_command: view schedule for <identifiers>.\n"
-        "  history_command: history for <identifiers>.\n"
-        "  help_command: help.\n"
-        "  exit_command: exit."
-    )
+    if len(p) == 3:
+        p[0] = f"""
+        Displaying available commands:
+
+        book_command:
+            Book ticket for <service> from <location> to <location> on <date> at <time> for <person>.
+            Book <number> tickets for <service> from <location> to <location> on <date> at <time> for <person>.
+
+        confirm_command:
+            Confirm reservation for <service> for <person>.
+            Confirm <number> reservations for <service> for <person>.
+
+        pay_command:
+            Pay <number> reservations for <identifiers> for <identifiers>.
+
+        cancel_command:
+            Cancel reservation for <identifiers> for <identifiers>.
+            Cancel <number> reservations for <identifiers> for <identifiers>.
+
+        list_command:
+            List available schedule for <identifiers>.
+            List available schedules for <identifiers>.
+
+        view_command:
+            View schedule for <identifiers>.
+            View schedules for <identifiers>.
+
+        history_command:
+            History for <identifiers>.
+
+        help_command:
+            Display this help message.
+
+        exit_command:
+            Exit.
+
+        clear_command:
+            Clear.
+            Cls.
+        """
+        
 
 
 def p_exit_command(p):
@@ -321,116 +414,98 @@ def p_exit_command(p):
     exit()
 
 
-# FIXME : Need to output the corresponding error message for each command
 # Error handling
 def p_error(p):
-    if p:
-        if (
-            p.type == "FROM"
-            or p.type == "TO"
-            or p.type == "ON"
-            or p.type == "AT"
-            or p.type == "DATE"
-            or p.type == "TIME"
-        ):
-            print(
-                "Syntax error: Incorrect order. The correct format is: KEYWORD_BOOK <service> FROM <location> TO <location> ON <date> AT <time> FOR <person> SYM_END"
-            )
-        elif p.type == "RESERVATION":
-            if (
-                p.lexer.lexpos > 0
-                and p.lexer.lexdata[p.lexer.lexpos - 1 : p.lexer.lexpos] == " "
-            ):
-                if p.lexer.lexdata[p.lexer.lexpos - 2 : p.lexer.lexpos - 1] == "L":
-                    print(
-                        "Syntax error: Incorrect order. The correct format is: KEYWORD_CANCEL RESERVATION FOR <identifier> FOR <identifier> SYM_END"
-                    )
-                elif p.lexer.lexdata[p.lexer.lexpos - 2 : p.lexer.lexpos - 1] == "Y":
-                    print(
-                        "Syntax error: Incorrect order. The correct format is: KEYWORD_PAY RESERVATION FOR <identifier> FOR <identifier> SYM_END"
-                    )
-                elif p.lexer.lexdata[p.lexer.lexpos - 2 : p.lexer.lexpos - 1] == "M":
-                    print(
-                        "Syntax error: Incorrect order. The correct format is: KEYWORD_CONFIRM RESERVATION FOR <identifier> FOR <identifier> SYM_END"
-                    )
-                else:
-                    print(
-                        "Syntax error: Incorrect order. The correct format is: KEYWORD_CONFIRM/PAY/CANCEL RESERVATION FOR <identifier> FOR <identifier> SYM_END"
-                    )
-            else:
-                print(
-                    "Syntax error: Incorrect order. The correct format is: KEYWORD_CONFIRM/PAY/CANCEL RESERVATION FOR <identifier> FOR <identifier> SYM_END"
-                )
-        elif p.type == "SCHEDULE":
-            if (
-                p.lexer.lexpos > 0
-                and p.lexer.lexdata[p.lexer.lexpos - 1 : p.lexer.lexpos] == " "
-            ):
-                if p.lexer.lexdata[p.lexer.lexpos - 2 : p.lexer.lexpos - 1] == "T":
-                    print(
-                        "Syntax error: Incorrect order. The correct format is: KEYWORD_VIEW SCHEDULE FOR <person> SYM_END"
-                    )
-                elif p.lexer.lexdata[p.lexer.lexpos - 2 : p.lexer.lexpos - 1] == "T":
-                    print(
-                        "Syntax error: Incorrect order. The correct format is: KEYWORD_LIST <service> SCHEDULE SYM_END"
-                    )
-                else:
-                    print(
-                        "Syntax error: Incorrect order. The correct format is: KEYWORD_LIST/VIEW <service> SCHEDULE SYM_END"
-                    )
-            else:
-                print(
-                    "Syntax error: Incorrect order. The correct format is: KEYWORD_LIST/VIEW <service> SCHEDULE SYM_END"
-                )
+    print(
+        "Syntax error: Incorrect format. Please use one of the following command formats:"
+    )
 
-        elif p.type == "FOR":
-            if (
-                p.lexer.lexpos > 0
-                and p.lexer.lexdata[p.lexer.lexpos - 1 : p.lexer.lexpos] == " "
-            ):
-                if p.lexer.lexdata[p.lexer.lexpos - 2 : p.lexer.lexpos - 1] == "Y":
-                    print(
-                        "Syntax error: Incorrect order. The correct format is: KEYWORD_HISTORY FOR <person> SYM_END"
-                    )
-                else:
-                    print(
-                        "Syntax error: Incorrect order. The correct format is: KEYWORD_HISTORY FOR <person> SYM_END"
-                    )
-            else:
-                print(
-                    "Syntax error: Incorrect order. The correct format is: KEYWORD_HISTORY FOR <person> SYM_END"
-                )
+    command_formats = """
+        Date format:
+            <month> <day> <year>. Example: February 17, 2025
 
-        elif p.type == "SYM_END":
-            if (
-                p.lexer.lexpos > 0
-                and p.lexer.lexdata[p.lexer.lexpos - 1 : p.lexer.lexpos] == " "
-            ):
-                if p.lexer.lexdata[p.lexer.lexpos - 2 : p.lexer.lexpos - 1] == "P":
-                    print(
-                        "Syntax error: Incorrect order. The correct format is: KEYWORD_HELP SYM_END"
-                    )
-                elif p.lexer.lexdata[p.lexer.lexpos - 2 : p.lexer.lexpos - 1] == "T":
-                    print(
-                        "Syntax error: Incorrect order. The correct format is: KEYWORD_EXIT SYM_END"
-                    )
-                else:
-                    print(
-                        "Syntax error: Incorrect order. The correct format is: KEYWORD_HELP/EXIT SYM_END"
-                    )
-            else:
-                print(
-                    "Syntax error: Incorrect order. The correct format is: KEYWORD_HELP/EXIT SYM_END"
-                )
+        ___________
+        
+        (12 hour time with AM/PM, 24 hour time)
+        Time format:
+            <hour>:<minute> AM/PM OR <hour>:<minute>. Example: 8:30 AM OR 20:30
+            
+        ___________
 
-        elif p.type == "IDENTIFIER":
-            print(
-                "Syntax error: Missing keywords. The correct format is: KEYWORD_BOOK <service> FROM <location> TO <location> ON <date> AT <time> FOR <person> SYM_END"
-            )
-        else:
-            print(f"Syntax error: Unexpected token '{p.type}' at line {p.lineno}")
-    else:
-        print("Syntax error: Unexpected end of input")
+        Person format:
+            <first_name> <last_name>. Example: Joy Reynolds
+            "<first_name> <last_name>". Example: "Joy Reynolds"
+            
+        ___________
+
+        Location format:
+            <city>, <state>. Example: New York, NY
+            "<city>, <state>". Example: "New York, NY"
+        
+        ___________
+            
+        Number format:
+            <number>. Example: 2 (Should be greater than 0)
+
+        ___________
+        
+        Book command:
+            Book ticket for <service> from <location> to <location> on <date> at <time> for <person>.
+            Book <number> tickets for <service> from <location> to <location> on <date> at <time> for <person>.
+        
+        ___________
+            
+        Confirm command:
+            Confirm reservation for <service> for <person>.
+            Confirm <number> reservations for <service> for <person>.
+        
+        ___________
+            
+        Pay command:
+            Pay reservation for <service> for <person>.
+            Pay <number> reservations for <service> for <person>.
+        
+        ___________
+            
+        Cancel command:
+            Cancel reservation FOR <service> for <person>.
+            Cancel <number> reservations for <service> for <person>.
+        
+        ___________
+
+        List command:
+            List <service> schedule.
+            List <service> schedules.
+        
+        ___________
+            
+        View command:
+            View schedule for <person>.
+            View schedules for <person>.
+        
+        ___________
+
+        History command:
+            History for <person>.
+        
+        ___________
+            
+        Help command:
+            Help.
+
+        ___________
+        
+        Exit command:
+            Exit.
+        
+        ___________
+
+        Clear command:
+            Clear.
+            Cls.
+    """
+
+    print(command_formats)
 
 
 # Build the parser
@@ -450,7 +525,7 @@ def main():
             break
         if not s:
             continue
-        elif s == "clear" or s == "cls":
+        elif s.lower() == "clear." or s.lower() == "cls.":
             os.system("clear")
             print("Welcome to APL Booking Project Language (APBL Version 1.0)\n")
             continue
