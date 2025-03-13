@@ -32,16 +32,16 @@ reserved = {
 
 # Token list
 tokens = [
-    # Time/date values
-    "DATE",
-    "TIME",
-    # Numeric values
-    "INTEGER",
-    "STRING",
-    "FLOAT",
-    # Identifiers
-    "IDENTIFIER",
-] + list(reserved.values())
+             # Time/date values
+             "DATE",
+             "TIME",
+             # Numeric values
+             "INTEGER",
+             "STRING",
+             "FLOAT",
+             # Identifiers
+             "IDENTIFIER",
+         ] + list(reserved.values())
 
 
 # Comments (ignored)
@@ -404,7 +404,6 @@ def p_help_command(p):
             Clear.
             Cls.
         """
-        
 
 
 def p_exit_command(p):
@@ -513,6 +512,8 @@ parser = yacc.yacc()
 
 
 def main():
+    lexical_mode = False
+
     print("Welcome to APL Booking Project Language (APBL Version 1.0)\n")
 
     while True:
@@ -529,15 +530,36 @@ def main():
             os.system("clear")
             print("Welcome to APL Booking Project Language (APBL Version 1.0)\n")
             continue
+        elif s.lower() == "stat lex_mode":
+            if not lexical_mode:
+                print("Compiler Status: Lexical analysis mode disabled.")
+                print("Compiler Status: Syntax analysis mode enabled.\n")
+                continue
+            else:
+                print("Compiler Status: Lexical analysis mode enabled.")
+                print("Compiler Status: Syntax analysis mode disabled.\n")
+                continue
+        elif s.lower() == "set lex_mode=true":
+            lexical_mode = True
+            print("Compiler Status: Lexical analysis mode enabled.")
+            print("Compiler Status: Syntax analysis mode disabled.\n")
+            continue
+        elif s.lower() == "set lex_mode=false":
+            lexical_mode = False
+            print("Compiler Status: Lexical analysis mode disabled.")
+            print("Compiler Status: Syntax analysis mode enabled.\n")
+            continue
 
-        # lexer.input(s)
-        parser.parse(input=s, lexer=lexer)
-        print("\n")
+        if lexical_mode:
+            lexer.input(s)
 
-    # Iterate through all tokens
-    # for tok in lexer:
-    #     print(tok)
-    # print('\n')
+            # Iterate through all tokens
+            for tok in lexer:
+                print(tok)
+            print("\n")
+        else:
+            parser.parse(input=s, lexer=lexer)
+            print("\n")
 
 
 if __name__ == "__main__":
