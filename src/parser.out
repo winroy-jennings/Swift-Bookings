@@ -28,40 +28,39 @@ Rule 18    pay_command -> KEYWORD_PAY INTEGER RESERVATIONS FOR identifier_list F
 Rule 19    cancel_command -> KEYWORD_CANCEL RESERVATION FOR identifier_list FOR identifier_list SYM_END
 Rule 20    cancel_command -> KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END
 Rule 21    list_command -> KEYWORD_LIST identifier_list SCHEDULE SYM_END
-Rule 22    list_command -> KEYWORD_LIST identifier_list SCHEDULES SYM_END
-Rule 23    view_command -> KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END
-Rule 24    view_command -> KEYWORD_VIEW SCHEDULES FOR identifier_list SYM_END
-Rule 25    history_command -> KEYWORD_HISTORY FOR identifier_list SYM_END
-Rule 26    help_command -> KEYWORD_HELP SYM_END
-Rule 27    exit_command -> KEYWORD_EXIT SYM_END
+Rule 22    view_command -> KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END
+Rule 23    view_command -> KEYWORD_VIEW SCHEDULES FOR identifier_list SYM_END
+Rule 24    history_command -> KEYWORD_HISTORY FOR identifier_list SYM_END
+Rule 25    help_command -> KEYWORD_HELP SYM_END
+Rule 26    exit_command -> KEYWORD_EXIT SYM_END
 
 Terminals, with rules where they appear
 
 AT                   : 13 14
 DATE                 : 13 14
 FLOAT                : 
-FOR                  : 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 23 24 25
+FOR                  : 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 22 23 24
 FROM                 : 13 14
 IDENTIFIER           : 10 11
 INTEGER              : 14 16 18 20
 KEYWORD_BOOK         : 13 14
 KEYWORD_CANCEL       : 19 20
 KEYWORD_CONFIRM      : 15 16
-KEYWORD_EXIT         : 27
-KEYWORD_HELP         : 26
-KEYWORD_HISTORY      : 25
-KEYWORD_LIST         : 21 22
+KEYWORD_EXIT         : 26
+KEYWORD_HELP         : 25
+KEYWORD_HISTORY      : 24
+KEYWORD_LIST         : 21
 KEYWORD_PAY          : 17 18
 KEYWORD_TICKET       : 13
 KEYWORD_TICKETS      : 14
-KEYWORD_VIEW         : 23 24
+KEYWORD_VIEW         : 22 23
 ON                   : 13 14
 RESERVATION          : 15 17 19
 RESERVATIONS         : 16 18 20
-SCHEDULE             : 21 23
-SCHEDULES            : 22 24
+SCHEDULE             : 21 22
+SCHEDULES            : 23
 STRING               : 12
-SYM_END              : 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
+SYM_END              : 13 14 15 16 17 18 19 20 21 22 23 24 25 26
 TIME                 : 13 14
 TO                   : 13 14
 error                : 
@@ -75,7 +74,7 @@ confirm_command      : 2
 exit_command         : 9
 help_command         : 8
 history_command      : 7
-identifier_list      : 10 13 13 13 13 14 14 14 14 15 15 16 16 17 17 18 18 19 19 20 20 21 22 23 24 25
+identifier_list      : 10 13 13 13 13 14 14 14 14 15 15 16 16 17 17 18 18 19 19 20 20 21 22 23 24
 list_command         : 5
 pay_command          : 3
 view_command         : 6
@@ -103,12 +102,11 @@ state 0
     (19) cancel_command -> . KEYWORD_CANCEL RESERVATION FOR identifier_list FOR identifier_list SYM_END
     (20) cancel_command -> . KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END
     (21) list_command -> . KEYWORD_LIST identifier_list SCHEDULE SYM_END
-    (22) list_command -> . KEYWORD_LIST identifier_list SCHEDULES SYM_END
-    (23) view_command -> . KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END
-    (24) view_command -> . KEYWORD_VIEW SCHEDULES FOR identifier_list SYM_END
-    (25) history_command -> . KEYWORD_HISTORY FOR identifier_list SYM_END
-    (26) help_command -> . KEYWORD_HELP SYM_END
-    (27) exit_command -> . KEYWORD_EXIT SYM_END
+    (22) view_command -> . KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END
+    (23) view_command -> . KEYWORD_VIEW SCHEDULES FOR identifier_list SYM_END
+    (24) history_command -> . KEYWORD_HISTORY FOR identifier_list SYM_END
+    (25) help_command -> . KEYWORD_HELP SYM_END
+    (26) exit_command -> . KEYWORD_EXIT SYM_END
 
     KEYWORD_BOOK    shift and go to state 11
     KEYWORD_CONFIRM shift and go to state 12
@@ -239,7 +237,6 @@ state 14
 state 15
 
     (21) list_command -> KEYWORD_LIST . identifier_list SCHEDULE SYM_END
-    (22) list_command -> KEYWORD_LIST . identifier_list SCHEDULES SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
     (11) identifier_list -> . IDENTIFIER
     (12) identifier_list -> . STRING
@@ -251,8 +248,8 @@ state 15
 
 state 16
 
-    (23) view_command -> KEYWORD_VIEW . SCHEDULE FOR identifier_list SYM_END
-    (24) view_command -> KEYWORD_VIEW . SCHEDULES FOR identifier_list SYM_END
+    (22) view_command -> KEYWORD_VIEW . SCHEDULE FOR identifier_list SYM_END
+    (23) view_command -> KEYWORD_VIEW . SCHEDULES FOR identifier_list SYM_END
 
     SCHEDULE        shift and go to state 31
     SCHEDULES       shift and go to state 32
@@ -260,21 +257,21 @@ state 16
 
 state 17
 
-    (25) history_command -> KEYWORD_HISTORY . FOR identifier_list SYM_END
+    (24) history_command -> KEYWORD_HISTORY . FOR identifier_list SYM_END
 
     FOR             shift and go to state 33
 
 
 state 18
 
-    (26) help_command -> KEYWORD_HELP . SYM_END
+    (25) help_command -> KEYWORD_HELP . SYM_END
 
     SYM_END         shift and go to state 34
 
 
 state 19
 
-    (27) exit_command -> KEYWORD_EXIT . SYM_END
+    (26) exit_command -> KEYWORD_EXIT . SYM_END
 
     SYM_END         shift and go to state 35
 
@@ -338,10 +335,8 @@ state 27
 state 28
 
     (21) list_command -> KEYWORD_LIST identifier_list . SCHEDULE SYM_END
-    (22) list_command -> KEYWORD_LIST identifier_list . SCHEDULES SYM_END
 
     SCHEDULE        shift and go to state 44
-    SCHEDULES       shift and go to state 45
 
 
 state 29
@@ -353,7 +348,6 @@ state 29
     (12) identifier_list -> . STRING
 
     SCHEDULE        reduce using rule 11 (identifier_list -> IDENTIFIER .)
-    SCHEDULES       reduce using rule 11 (identifier_list -> IDENTIFIER .)
     SYM_END         reduce using rule 11 (identifier_list -> IDENTIFIER .)
     FROM            reduce using rule 11 (identifier_list -> IDENTIFIER .)
     FOR             reduce using rule 11 (identifier_list -> IDENTIFIER .)
@@ -362,14 +356,13 @@ state 29
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 46
+    identifier_list                shift and go to state 45
 
 state 30
 
     (12) identifier_list -> STRING .
 
     SCHEDULE        reduce using rule 12 (identifier_list -> STRING .)
-    SCHEDULES       reduce using rule 12 (identifier_list -> STRING .)
     SYM_END         reduce using rule 12 (identifier_list -> STRING .)
     FROM            reduce using rule 12 (identifier_list -> STRING .)
     FOR             reduce using rule 12 (identifier_list -> STRING .)
@@ -379,21 +372,21 @@ state 30
 
 state 31
 
-    (23) view_command -> KEYWORD_VIEW SCHEDULE . FOR identifier_list SYM_END
+    (22) view_command -> KEYWORD_VIEW SCHEDULE . FOR identifier_list SYM_END
 
-    FOR             shift and go to state 47
+    FOR             shift and go to state 46
 
 
 state 32
 
-    (24) view_command -> KEYWORD_VIEW SCHEDULES . FOR identifier_list SYM_END
+    (23) view_command -> KEYWORD_VIEW SCHEDULES . FOR identifier_list SYM_END
 
-    FOR             shift and go to state 48
+    FOR             shift and go to state 47
 
 
 state 33
 
-    (25) history_command -> KEYWORD_HISTORY FOR . identifier_list SYM_END
+    (24) history_command -> KEYWORD_HISTORY FOR . identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
     (11) identifier_list -> . IDENTIFIER
     (12) identifier_list -> . STRING
@@ -401,20 +394,20 @@ state 33
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 49
+    identifier_list                shift and go to state 48
 
 state 34
 
-    (26) help_command -> KEYWORD_HELP SYM_END .
+    (25) help_command -> KEYWORD_HELP SYM_END .
 
-    $end            reduce using rule 26 (help_command -> KEYWORD_HELP SYM_END .)
+    $end            reduce using rule 25 (help_command -> KEYWORD_HELP SYM_END .)
 
 
 state 35
 
-    (27) exit_command -> KEYWORD_EXIT SYM_END .
+    (26) exit_command -> KEYWORD_EXIT SYM_END .
 
-    $end            reduce using rule 27 (exit_command -> KEYWORD_EXIT SYM_END .)
+    $end            reduce using rule 26 (exit_command -> KEYWORD_EXIT SYM_END .)
 
 
 state 36
@@ -427,13 +420,13 @@ state 36
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 50
+    identifier_list                shift and go to state 49
 
 state 37
 
     (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS . FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
-    FOR             shift and go to state 51
+    FOR             shift and go to state 50
 
 
 state 38
@@ -446,13 +439,13 @@ state 38
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 52
+    identifier_list                shift and go to state 51
 
 state 39
 
     (16) confirm_command -> KEYWORD_CONFIRM INTEGER RESERVATIONS . FOR identifier_list FOR identifier_list SYM_END
 
-    FOR             shift and go to state 53
+    FOR             shift and go to state 52
 
 
 state 40
@@ -465,13 +458,13 @@ state 40
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 54
+    identifier_list                shift and go to state 53
 
 state 41
 
     (18) pay_command -> KEYWORD_PAY INTEGER RESERVATIONS . FOR identifier_list FOR identifier_list SYM_END
 
-    FOR             shift and go to state 55
+    FOR             shift and go to state 54
 
 
 state 42
@@ -484,35 +477,27 @@ state 42
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 56
+    identifier_list                shift and go to state 55
 
 state 43
 
     (20) cancel_command -> KEYWORD_CANCEL INTEGER RESERVATIONS . FOR identifier_list FOR identifier_list SYM_END
 
-    FOR             shift and go to state 57
+    FOR             shift and go to state 56
 
 
 state 44
 
     (21) list_command -> KEYWORD_LIST identifier_list SCHEDULE . SYM_END
 
-    SYM_END         shift and go to state 58
+    SYM_END         shift and go to state 57
 
 
 state 45
 
-    (22) list_command -> KEYWORD_LIST identifier_list SCHEDULES . SYM_END
-
-    SYM_END         shift and go to state 59
-
-
-state 46
-
     (10) identifier_list -> IDENTIFIER identifier_list .
 
     SCHEDULE        reduce using rule 10 (identifier_list -> IDENTIFIER identifier_list .)
-    SCHEDULES       reduce using rule 10 (identifier_list -> IDENTIFIER identifier_list .)
     SYM_END         reduce using rule 10 (identifier_list -> IDENTIFIER identifier_list .)
     FROM            reduce using rule 10 (identifier_list -> IDENTIFIER identifier_list .)
     FOR             reduce using rule 10 (identifier_list -> IDENTIFIER identifier_list .)
@@ -520,9 +505,9 @@ state 46
     ON              reduce using rule 10 (identifier_list -> IDENTIFIER identifier_list .)
 
 
-state 47
+state 46
 
-    (23) view_command -> KEYWORD_VIEW SCHEDULE FOR . identifier_list SYM_END
+    (22) view_command -> KEYWORD_VIEW SCHEDULE FOR . identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
     (11) identifier_list -> . IDENTIFIER
     (12) identifier_list -> . STRING
@@ -530,35 +515,35 @@ state 47
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 60
+    identifier_list                shift and go to state 58
+
+state 47
+
+    (23) view_command -> KEYWORD_VIEW SCHEDULES FOR . identifier_list SYM_END
+    (10) identifier_list -> . IDENTIFIER identifier_list
+    (11) identifier_list -> . IDENTIFIER
+    (12) identifier_list -> . STRING
+
+    IDENTIFIER      shift and go to state 29
+    STRING          shift and go to state 30
+
+    identifier_list                shift and go to state 59
 
 state 48
 
-    (24) view_command -> KEYWORD_VIEW SCHEDULES FOR . identifier_list SYM_END
-    (10) identifier_list -> . IDENTIFIER identifier_list
-    (11) identifier_list -> . IDENTIFIER
-    (12) identifier_list -> . STRING
+    (24) history_command -> KEYWORD_HISTORY FOR identifier_list . SYM_END
 
-    IDENTIFIER      shift and go to state 29
-    STRING          shift and go to state 30
+    SYM_END         shift and go to state 60
 
-    identifier_list                shift and go to state 61
 
 state 49
 
-    (25) history_command -> KEYWORD_HISTORY FOR identifier_list . SYM_END
+    (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list . FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
-    SYM_END         shift and go to state 62
+    FROM            shift and go to state 61
 
 
 state 50
-
-    (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list . FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-
-    FROM            shift and go to state 63
-
-
-state 51
 
     (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR . identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
@@ -568,16 +553,16 @@ state 51
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 64
+    identifier_list                shift and go to state 62
 
-state 52
+state 51
 
     (15) confirm_command -> KEYWORD_CONFIRM RESERVATION FOR identifier_list . FOR identifier_list SYM_END
 
-    FOR             shift and go to state 65
+    FOR             shift and go to state 63
 
 
-state 53
+state 52
 
     (16) confirm_command -> KEYWORD_CONFIRM INTEGER RESERVATIONS FOR . identifier_list FOR identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
@@ -587,16 +572,16 @@ state 53
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 66
+    identifier_list                shift and go to state 64
 
-state 54
+state 53
 
     (17) pay_command -> KEYWORD_PAY RESERVATION FOR identifier_list . FOR identifier_list SYM_END
 
-    FOR             shift and go to state 67
+    FOR             shift and go to state 65
 
 
-state 55
+state 54
 
     (18) pay_command -> KEYWORD_PAY INTEGER RESERVATIONS FOR . identifier_list FOR identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
@@ -606,16 +591,16 @@ state 55
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 68
+    identifier_list                shift and go to state 66
 
-state 56
+state 55
 
     (19) cancel_command -> KEYWORD_CANCEL RESERVATION FOR identifier_list . FOR identifier_list SYM_END
 
-    FOR             shift and go to state 69
+    FOR             shift and go to state 67
 
 
-state 57
+state 56
 
     (20) cancel_command -> KEYWORD_CANCEL INTEGER RESERVATIONS FOR . identifier_list FOR identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
@@ -625,46 +610,58 @@ state 57
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 70
+    identifier_list                shift and go to state 68
 
-state 58
+state 57
 
     (21) list_command -> KEYWORD_LIST identifier_list SCHEDULE SYM_END .
 
     $end            reduce using rule 21 (list_command -> KEYWORD_LIST identifier_list SCHEDULE SYM_END .)
 
 
+state 58
+
+    (22) view_command -> KEYWORD_VIEW SCHEDULE FOR identifier_list . SYM_END
+
+    SYM_END         shift and go to state 69
+
+
 state 59
 
-    (22) list_command -> KEYWORD_LIST identifier_list SCHEDULES SYM_END .
+    (23) view_command -> KEYWORD_VIEW SCHEDULES FOR identifier_list . SYM_END
 
-    $end            reduce using rule 22 (list_command -> KEYWORD_LIST identifier_list SCHEDULES SYM_END .)
+    SYM_END         shift and go to state 70
 
 
 state 60
 
-    (23) view_command -> KEYWORD_VIEW SCHEDULE FOR identifier_list . SYM_END
+    (24) history_command -> KEYWORD_HISTORY FOR identifier_list SYM_END .
 
-    SYM_END         shift and go to state 71
+    $end            reduce using rule 24 (history_command -> KEYWORD_HISTORY FOR identifier_list SYM_END .)
 
 
 state 61
 
-    (24) view_command -> KEYWORD_VIEW SCHEDULES FOR identifier_list . SYM_END
+    (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM . identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+    (10) identifier_list -> . IDENTIFIER identifier_list
+    (11) identifier_list -> . IDENTIFIER
+    (12) identifier_list -> . STRING
 
-    SYM_END         shift and go to state 72
+    IDENTIFIER      shift and go to state 29
+    STRING          shift and go to state 30
 
+    identifier_list                shift and go to state 71
 
 state 62
 
-    (25) history_command -> KEYWORD_HISTORY FOR identifier_list SYM_END .
+    (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list . FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
-    $end            reduce using rule 25 (history_command -> KEYWORD_HISTORY FOR identifier_list SYM_END .)
+    FROM            shift and go to state 72
 
 
 state 63
 
-    (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM . identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+    (15) confirm_command -> KEYWORD_CONFIRM RESERVATION FOR identifier_list FOR . identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
     (11) identifier_list -> . IDENTIFIER
     (12) identifier_list -> . STRING
@@ -676,14 +673,14 @@ state 63
 
 state 64
 
-    (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list . FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+    (16) confirm_command -> KEYWORD_CONFIRM INTEGER RESERVATIONS FOR identifier_list . FOR identifier_list SYM_END
 
-    FROM            shift and go to state 74
+    FOR             shift and go to state 74
 
 
 state 65
 
-    (15) confirm_command -> KEYWORD_CONFIRM RESERVATION FOR identifier_list FOR . identifier_list SYM_END
+    (17) pay_command -> KEYWORD_PAY RESERVATION FOR identifier_list FOR . identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
     (11) identifier_list -> . IDENTIFIER
     (12) identifier_list -> . STRING
@@ -695,14 +692,14 @@ state 65
 
 state 66
 
-    (16) confirm_command -> KEYWORD_CONFIRM INTEGER RESERVATIONS FOR identifier_list . FOR identifier_list SYM_END
+    (18) pay_command -> KEYWORD_PAY INTEGER RESERVATIONS FOR identifier_list . FOR identifier_list SYM_END
 
     FOR             shift and go to state 76
 
 
 state 67
 
-    (17) pay_command -> KEYWORD_PAY RESERVATION FOR identifier_list FOR . identifier_list SYM_END
+    (19) cancel_command -> KEYWORD_CANCEL RESERVATION FOR identifier_list FOR . identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
     (11) identifier_list -> . IDENTIFIER
     (12) identifier_list -> . STRING
@@ -714,14 +711,35 @@ state 67
 
 state 68
 
-    (18) pay_command -> KEYWORD_PAY INTEGER RESERVATIONS FOR identifier_list . FOR identifier_list SYM_END
+    (20) cancel_command -> KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list . FOR identifier_list SYM_END
 
     FOR             shift and go to state 78
 
 
 state 69
 
-    (19) cancel_command -> KEYWORD_CANCEL RESERVATION FOR identifier_list FOR . identifier_list SYM_END
+    (22) view_command -> KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END .
+
+    $end            reduce using rule 22 (view_command -> KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END .)
+
+
+state 70
+
+    (23) view_command -> KEYWORD_VIEW SCHEDULES FOR identifier_list SYM_END .
+
+    $end            reduce using rule 23 (view_command -> KEYWORD_VIEW SCHEDULES FOR identifier_list SYM_END .)
+
+
+state 71
+
+    (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list . TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+
+    TO              shift and go to state 79
+
+
+state 72
+
+    (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM . identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
     (11) identifier_list -> . IDENTIFIER
     (12) identifier_list -> . STRING
@@ -729,39 +747,18 @@ state 69
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 79
-
-state 70
-
-    (20) cancel_command -> KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list . FOR identifier_list SYM_END
-
-    FOR             shift and go to state 80
-
-
-state 71
-
-    (23) view_command -> KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END .
-
-    $end            reduce using rule 23 (view_command -> KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END .)
-
-
-state 72
-
-    (24) view_command -> KEYWORD_VIEW SCHEDULES FOR identifier_list SYM_END .
-
-    $end            reduce using rule 24 (view_command -> KEYWORD_VIEW SCHEDULES FOR identifier_list SYM_END .)
-
+    identifier_list                shift and go to state 80
 
 state 73
 
-    (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list . TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+    (15) confirm_command -> KEYWORD_CONFIRM RESERVATION FOR identifier_list FOR identifier_list . SYM_END
 
-    TO              shift and go to state 81
+    SYM_END         shift and go to state 81
 
 
 state 74
 
-    (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM . identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+    (16) confirm_command -> KEYWORD_CONFIRM INTEGER RESERVATIONS FOR identifier_list FOR . identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
     (11) identifier_list -> . IDENTIFIER
     (12) identifier_list -> . STRING
@@ -773,14 +770,14 @@ state 74
 
 state 75
 
-    (15) confirm_command -> KEYWORD_CONFIRM RESERVATION FOR identifier_list FOR identifier_list . SYM_END
+    (17) pay_command -> KEYWORD_PAY RESERVATION FOR identifier_list FOR identifier_list . SYM_END
 
     SYM_END         shift and go to state 83
 
 
 state 76
 
-    (16) confirm_command -> KEYWORD_CONFIRM INTEGER RESERVATIONS FOR identifier_list FOR . identifier_list SYM_END
+    (18) pay_command -> KEYWORD_PAY INTEGER RESERVATIONS FOR identifier_list FOR . identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
     (11) identifier_list -> . IDENTIFIER
     (12) identifier_list -> . STRING
@@ -792,14 +789,14 @@ state 76
 
 state 77
 
-    (17) pay_command -> KEYWORD_PAY RESERVATION FOR identifier_list FOR identifier_list . SYM_END
+    (19) cancel_command -> KEYWORD_CANCEL RESERVATION FOR identifier_list FOR identifier_list . SYM_END
 
     SYM_END         shift and go to state 85
 
 
 state 78
 
-    (18) pay_command -> KEYWORD_PAY INTEGER RESERVATIONS FOR identifier_list FOR . identifier_list SYM_END
+    (20) cancel_command -> KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list FOR . identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
     (11) identifier_list -> . IDENTIFIER
     (12) identifier_list -> . STRING
@@ -811,25 +808,6 @@ state 78
 
 state 79
 
-    (19) cancel_command -> KEYWORD_CANCEL RESERVATION FOR identifier_list FOR identifier_list . SYM_END
-
-    SYM_END         shift and go to state 87
-
-
-state 80
-
-    (20) cancel_command -> KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list FOR . identifier_list SYM_END
-    (10) identifier_list -> . IDENTIFIER identifier_list
-    (11) identifier_list -> . IDENTIFIER
-    (12) identifier_list -> . STRING
-
-    IDENTIFIER      shift and go to state 29
-    STRING          shift and go to state 30
-
-    identifier_list                shift and go to state 88
-
-state 81
-
     (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO . identifier_list ON DATE AT TIME FOR identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
     (11) identifier_list -> . IDENTIFIER
@@ -838,65 +816,65 @@ state 81
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 89
+    identifier_list                shift and go to state 87
 
-state 82
+state 80
 
     (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list . TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
-    TO              shift and go to state 90
+    TO              shift and go to state 88
 
 
-state 83
+state 81
 
     (15) confirm_command -> KEYWORD_CONFIRM RESERVATION FOR identifier_list FOR identifier_list SYM_END .
 
     $end            reduce using rule 15 (confirm_command -> KEYWORD_CONFIRM RESERVATION FOR identifier_list FOR identifier_list SYM_END .)
 
 
-state 84
+state 82
 
     (16) confirm_command -> KEYWORD_CONFIRM INTEGER RESERVATIONS FOR identifier_list FOR identifier_list . SYM_END
 
-    SYM_END         shift and go to state 91
+    SYM_END         shift and go to state 89
 
 
-state 85
+state 83
 
     (17) pay_command -> KEYWORD_PAY RESERVATION FOR identifier_list FOR identifier_list SYM_END .
 
     $end            reduce using rule 17 (pay_command -> KEYWORD_PAY RESERVATION FOR identifier_list FOR identifier_list SYM_END .)
 
 
-state 86
+state 84
 
     (18) pay_command -> KEYWORD_PAY INTEGER RESERVATIONS FOR identifier_list FOR identifier_list . SYM_END
 
-    SYM_END         shift and go to state 92
+    SYM_END         shift and go to state 90
 
 
-state 87
+state 85
 
     (19) cancel_command -> KEYWORD_CANCEL RESERVATION FOR identifier_list FOR identifier_list SYM_END .
 
     $end            reduce using rule 19 (cancel_command -> KEYWORD_CANCEL RESERVATION FOR identifier_list FOR identifier_list SYM_END .)
 
 
-state 88
+state 86
 
     (20) cancel_command -> KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list FOR identifier_list . SYM_END
 
-    SYM_END         shift and go to state 93
+    SYM_END         shift and go to state 91
 
 
-state 89
+state 87
 
     (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list . ON DATE AT TIME FOR identifier_list SYM_END
 
-    ON              shift and go to state 94
+    ON              shift and go to state 92
 
 
-state 90
+state 88
 
     (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO . identifier_list ON DATE AT TIME FOR identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
@@ -906,86 +884,86 @@ state 90
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 95
+    identifier_list                shift and go to state 93
 
-state 91
+state 89
 
     (16) confirm_command -> KEYWORD_CONFIRM INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END .
 
     $end            reduce using rule 16 (confirm_command -> KEYWORD_CONFIRM INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END .)
 
 
-state 92
+state 90
 
     (18) pay_command -> KEYWORD_PAY INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END .
 
     $end            reduce using rule 18 (pay_command -> KEYWORD_PAY INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END .)
 
 
-state 93
+state 91
 
     (20) cancel_command -> KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END .
 
     $end            reduce using rule 20 (cancel_command -> KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END .)
 
 
-state 94
+state 92
 
     (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON . DATE AT TIME FOR identifier_list SYM_END
 
-    DATE            shift and go to state 96
+    DATE            shift and go to state 94
+
+
+state 93
+
+    (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list . ON DATE AT TIME FOR identifier_list SYM_END
+
+    ON              shift and go to state 95
+
+
+state 94
+
+    (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE . AT TIME FOR identifier_list SYM_END
+
+    AT              shift and go to state 96
 
 
 state 95
 
-    (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list . ON DATE AT TIME FOR identifier_list SYM_END
+    (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON . DATE AT TIME FOR identifier_list SYM_END
 
-    ON              shift and go to state 97
+    DATE            shift and go to state 97
 
 
 state 96
 
-    (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE . AT TIME FOR identifier_list SYM_END
+    (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT . TIME FOR identifier_list SYM_END
 
-    AT              shift and go to state 98
+    TIME            shift and go to state 98
 
 
 state 97
 
-    (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON . DATE AT TIME FOR identifier_list SYM_END
+    (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE . AT TIME FOR identifier_list SYM_END
 
-    DATE            shift and go to state 99
+    AT              shift and go to state 99
 
 
 state 98
 
-    (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT . TIME FOR identifier_list SYM_END
+    (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME . FOR identifier_list SYM_END
 
-    TIME            shift and go to state 100
+    FOR             shift and go to state 100
 
 
 state 99
 
-    (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE . AT TIME FOR identifier_list SYM_END
+    (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT . TIME FOR identifier_list SYM_END
 
-    AT              shift and go to state 101
+    TIME            shift and go to state 101
 
 
 state 100
-
-    (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME . FOR identifier_list SYM_END
-
-    FOR             shift and go to state 102
-
-
-state 101
-
-    (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT . TIME FOR identifier_list SYM_END
-
-    TIME            shift and go to state 103
-
-
-state 102
 
     (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR . identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
@@ -995,23 +973,23 @@ state 102
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 104
+    identifier_list                shift and go to state 102
 
-state 103
+state 101
 
     (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME . FOR identifier_list SYM_END
 
-    FOR             shift and go to state 105
+    FOR             shift and go to state 103
 
 
-state 104
+state 102
 
     (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list . SYM_END
 
-    SYM_END         shift and go to state 106
+    SYM_END         shift and go to state 104
 
 
-state 105
+state 103
 
     (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR . identifier_list SYM_END
     (10) identifier_list -> . IDENTIFIER identifier_list
@@ -1021,23 +999,23 @@ state 105
     IDENTIFIER      shift and go to state 29
     STRING          shift and go to state 30
 
-    identifier_list                shift and go to state 107
+    identifier_list                shift and go to state 105
 
-state 106
+state 104
 
     (13) book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END .
 
     $end            reduce using rule 13 (book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END .)
 
 
-state 107
+state 105
 
     (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list . SYM_END
 
-    SYM_END         shift and go to state 108
+    SYM_END         shift and go to state 106
 
 
-state 108
+state 106
 
     (14) book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END .
 

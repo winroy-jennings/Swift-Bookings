@@ -1,7 +1,17 @@
+import json
+
 import ply.lex as lex
 import ply.yacc as yacc
 import os
 import calendar
+
+from google import genai
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path=".env.local")
+gemini_api_key = os.getenv("GEMINI_API_KEY")
+
+client = genai.Client(api_key=f"{gemini_api_key}")
 
 # Reserved words
 reserved = {
@@ -312,20 +322,72 @@ def p_cancel_command(p):
 
 # Examples:
 #  List Knutsford Express schedule.
-#  List Knutsford Express schedules.
+#  List Taylor Swift schedule.
 
 
 # List all the available schedules from a hotel/company.
 def p_list_command(p):
     """
     list_command : KEYWORD_LIST identifier_list SCHEDULE SYM_END
-                | KEYWORD_LIST identifier_list SCHEDULES SYM_END
     """
 
-    if p[3] == "schedule":
+    try:
+        system_prompt = f"""
+        When responding to user queries about reservable resources (e.g., events, transportation, accommodations, concert, tickets).
+        
+        Please adhere to the following guidelines:
+            Return just the JSON list of all the available information that is required for the service in question.
+            Remove the ```json ``` form the JSON list. 
+            No explanation needed.
+            If no schedules or events are found then return an empty JSON list.
+            Capitalize the first letter of each word in the key.
+        
+        For Transportation Services (Trains, Buses, Airlines):
+            In the list return only route, departure time, arrival time, duration, price and available seats
+            
+        For Concert Tickets
+            In the list, return only artist/band, venue, date, start time, ticket type, price, and available tickets.
+        
+        For Football Match Tickets:
+            In the list, return only teams, stadium, date, start time, seat location, price, and available tickets.
+        
+        For Accommodation (Hotels, Rentals):
+            In the list, return only property name, location, check-in date, check-out date, room type/unit type, price per night, and available rooms/units.
+        
+        For General Events (Theater, Shows, etc.):
+            In the list, return only event name, venue, date, start time, ticket type, price, and available tickets.
+        """
+
+        full_prompt = f"{system_prompt}\n\nWhat are the available schedules for {p[2]}."
+
+        response = client.models.generate_content(
+            model="gemini-2.0-flash", contents=full_prompt
+        )
+
+        # print(response.text)
+
+        query = response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        # print(f"{query}")
+
+        result = json.loads(query)
+
+        if len(result) == 0:
+            print(f"No schedules found for {p[2]}.")
+        else:
+            for item in result:
+                keys = list(item.keys())
+
+                for key, value in item.items():
+                    print(f'{key}: {value}', end=",\n" if key != keys[-1] else "\n")
+
+                if item != result[-1]:
+                    print("\n")
+
         p[0] = f"List available schedule for {p[2]}."
-    else:
-        p[0] = f"List available schedules for {p[2]}."
+    except json.JSONDecodeError as e:
+        print(f"Error: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
 
 
 # Examples:
@@ -558,7 +620,8 @@ def main():
                 print(tok)
             print("\n")
         else:
-            parser.parse(input=s, lexer=lexer)
+            result = parser.parse(input=s, lexer=lexer, debug=False)
+
             print("\n")
 
 

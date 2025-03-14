@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'AT DATE FLOAT FOR FROM IDENTIFIER INTEGER KEYWORD_BOOK KEYWORD_CANCEL KEYWORD_CONFIRM KEYWORD_EXIT KEYWORD_HELP KEYWORD_HISTORY KEYWORD_LIST KEYWORD_PAY KEYWORD_TICKET KEYWORD_TICKETS KEYWORD_VIEW ON RESERVATION RESERVATIONS SCHEDULE SCHEDULES STRING SYM_END TIME TO\ncommand : book_command\n        | confirm_command\n        | pay_command\n        | cancel_command\n        | list_command\n        | view_command\n        | history_command\n        | help_command\n        | exit_command\n\nidentifier_list : IDENTIFIER identifier_list\n                | IDENTIFIER\n                | STRING\n\nbook_command : KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END\n             | KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END\n\nconfirm_command : KEYWORD_CONFIRM RESERVATION FOR identifier_list FOR identifier_list SYM_END\n                | KEYWORD_CONFIRM INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END\n\npay_command : KEYWORD_PAY RESERVATION FOR identifier_list FOR identifier_list SYM_END\n            | KEYWORD_PAY INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END\n\ncancel_command : KEYWORD_CANCEL RESERVATION FOR identifier_list FOR identifier_list SYM_END\n                | KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END\n\nlist_command : KEYWORD_LIST identifier_list SCHEDULE SYM_END\n            | KEYWORD_LIST identifier_list SCHEDULES SYM_END\n\nview_command : KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END\n            | KEYWORD_VIEW SCHEDULES FOR identifier_list SYM_END\n\nhistory_command : KEYWORD_HISTORY FOR identifier_list SYM_END\n\nhelp_command : KEYWORD_HELP SYM_END\nexit_command : KEYWORD_EXIT SYM_END'
+_lr_signature = 'AT DATE FLOAT FOR FROM IDENTIFIER INTEGER KEYWORD_BOOK KEYWORD_CANCEL KEYWORD_CONFIRM KEYWORD_EXIT KEYWORD_HELP KEYWORD_HISTORY KEYWORD_LIST KEYWORD_PAY KEYWORD_TICKET KEYWORD_TICKETS KEYWORD_VIEW ON RESERVATION RESERVATIONS SCHEDULE SCHEDULES STRING SYM_END TIME TO\ncommand : book_command\n        | confirm_command\n        | pay_command\n        | cancel_command\n        | list_command\n        | view_command\n        | history_command\n        | help_command\n        | exit_command\n\nidentifier_list : IDENTIFIER identifier_list\n                | IDENTIFIER\n                | STRING\n\nbook_command : KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END\n             | KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END\n\nconfirm_command : KEYWORD_CONFIRM RESERVATION FOR identifier_list FOR identifier_list SYM_END\n                | KEYWORD_CONFIRM INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END\n\npay_command : KEYWORD_PAY RESERVATION FOR identifier_list FOR identifier_list SYM_END\n            | KEYWORD_PAY INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END\n\ncancel_command : KEYWORD_CANCEL RESERVATION FOR identifier_list FOR identifier_list SYM_END\n                | KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END\n\nlist_command : KEYWORD_LIST identifier_list SCHEDULE SYM_END\n\nview_command : KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END\n            | KEYWORD_VIEW SCHEDULES FOR identifier_list SYM_END\n\nhistory_command : KEYWORD_HISTORY FOR identifier_list SYM_END\n\nhelp_command : KEYWORD_HELP SYM_END\nexit_command : KEYWORD_EXIT SYM_END'
     
-_lr_action_items = {'KEYWORD_BOOK':([0,],[11,]),'KEYWORD_CONFIRM':([0,],[12,]),'KEYWORD_PAY':([0,],[13,]),'KEYWORD_CANCEL':([0,],[14,]),'KEYWORD_LIST':([0,],[15,]),'KEYWORD_VIEW':([0,],[16,]),'KEYWORD_HISTORY':([0,],[17,]),'KEYWORD_HELP':([0,],[18,]),'KEYWORD_EXIT':([0,],[19,]),'$end':([1,2,3,4,5,6,7,8,9,10,34,35,58,59,62,71,72,83,85,87,91,92,93,106,108,],[0,-1,-2,-3,-4,-5,-6,-7,-8,-9,-26,-27,-21,-22,-25,-23,-24,-15,-17,-19,-16,-18,-20,-13,-14,]),'KEYWORD_TICKET':([11,],[20,]),'INTEGER':([11,12,13,14,],[21,23,25,27,]),'RESERVATION':([12,13,14,],[22,24,26,]),'IDENTIFIER':([15,29,33,36,38,40,42,47,48,51,53,55,57,63,65,67,69,74,76,78,80,81,90,102,105,],[29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,]),'STRING':([15,29,33,36,38,40,42,47,48,51,53,55,57,63,65,67,69,74,76,78,80,81,90,102,105,],[30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,]),'SCHEDULE':([16,28,29,30,46,],[31,44,-11,-12,-10,]),'SCHEDULES':([16,28,29,30,46,],[32,45,-11,-12,-10,]),'FOR':([17,20,22,24,26,29,30,31,32,37,39,41,43,46,52,54,56,66,68,70,100,103,],[33,36,38,40,42,-11,-12,47,48,51,53,55,57,-10,65,67,69,76,78,80,102,105,]),'SYM_END':([18,19,29,30,44,45,46,49,60,61,75,77,79,84,86,88,104,107,],[34,35,-11,-12,58,59,-10,62,71,72,83,85,87,91,92,93,106,108,]),'KEYWORD_TICKETS':([21,],[37,]),'RESERVATIONS':([23,25,27,],[39,41,43,]),'FROM':([29,30,46,50,64,],[-11,-12,-10,63,74,]),'TO':([29,30,46,73,82,],[-11,-12,-10,81,90,]),'ON':([29,30,46,89,95,],[-11,-12,-10,94,97,]),'DATE':([94,97,],[96,99,]),'AT':([96,99,],[98,101,]),'TIME':([98,101,],[100,103,]),}
+_lr_action_items = {'KEYWORD_BOOK':([0,],[11,]),'KEYWORD_CONFIRM':([0,],[12,]),'KEYWORD_PAY':([0,],[13,]),'KEYWORD_CANCEL':([0,],[14,]),'KEYWORD_LIST':([0,],[15,]),'KEYWORD_VIEW':([0,],[16,]),'KEYWORD_HISTORY':([0,],[17,]),'KEYWORD_HELP':([0,],[18,]),'KEYWORD_EXIT':([0,],[19,]),'$end':([1,2,3,4,5,6,7,8,9,10,34,35,57,60,69,70,81,83,85,89,90,91,104,106,],[0,-1,-2,-3,-4,-5,-6,-7,-8,-9,-25,-26,-21,-24,-22,-23,-15,-17,-19,-16,-18,-20,-13,-14,]),'KEYWORD_TICKET':([11,],[20,]),'INTEGER':([11,12,13,14,],[21,23,25,27,]),'RESERVATION':([12,13,14,],[22,24,26,]),'IDENTIFIER':([15,29,33,36,38,40,42,46,47,50,52,54,56,61,63,65,67,72,74,76,78,79,88,100,103,],[29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,29,]),'STRING':([15,29,33,36,38,40,42,46,47,50,52,54,56,61,63,65,67,72,74,76,78,79,88,100,103,],[30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,]),'SCHEDULE':([16,28,29,30,45,],[31,44,-11,-12,-10,]),'SCHEDULES':([16,],[32,]),'FOR':([17,20,22,24,26,29,30,31,32,37,39,41,43,45,51,53,55,64,66,68,98,101,],[33,36,38,40,42,-11,-12,46,47,50,52,54,56,-10,63,65,67,74,76,78,100,103,]),'SYM_END':([18,19,29,30,44,45,48,58,59,73,75,77,82,84,86,102,105,],[34,35,-11,-12,57,-10,60,69,70,81,83,85,89,90,91,104,106,]),'KEYWORD_TICKETS':([21,],[37,]),'RESERVATIONS':([23,25,27,],[39,41,43,]),'FROM':([29,30,45,49,62,],[-11,-12,-10,61,72,]),'TO':([29,30,45,71,80,],[-11,-12,-10,79,88,]),'ON':([29,30,45,87,93,],[-11,-12,-10,92,95,]),'DATE':([92,95,],[94,97,]),'AT':([94,97,],[96,99,]),'TIME':([96,99,],[98,101,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'command':([0,],[1,]),'book_command':([0,],[2,]),'confirm_command':([0,],[3,]),'pay_command':([0,],[4,]),'cancel_command':([0,],[5,]),'list_command':([0,],[6,]),'view_command':([0,],[7,]),'history_command':([0,],[8,]),'help_command':([0,],[9,]),'exit_command':([0,],[10,]),'identifier_list':([15,29,33,36,38,40,42,47,48,51,53,55,57,63,65,67,69,74,76,78,80,81,90,102,105,],[28,46,49,50,52,54,56,60,61,64,66,68,70,73,75,77,79,82,84,86,88,89,95,104,107,]),}
+_lr_goto_items = {'command':([0,],[1,]),'book_command':([0,],[2,]),'confirm_command':([0,],[3,]),'pay_command':([0,],[4,]),'cancel_command':([0,],[5,]),'list_command':([0,],[6,]),'view_command':([0,],[7,]),'history_command':([0,],[8,]),'help_command':([0,],[9,]),'exit_command':([0,],[10,]),'identifier_list':([15,29,33,36,38,40,42,46,47,50,52,54,56,61,63,65,67,72,74,76,78,79,88,100,103,],[28,45,48,49,51,53,55,58,59,62,64,66,68,71,73,75,77,80,82,84,86,87,93,102,105,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,31 +27,30 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> command","S'",1,None,None,None),
-  ('command -> book_command','command',1,'p_command','lex.py',146),
-  ('command -> confirm_command','command',1,'p_command','lex.py',147),
-  ('command -> pay_command','command',1,'p_command','lex.py',148),
-  ('command -> cancel_command','command',1,'p_command','lex.py',149),
-  ('command -> list_command','command',1,'p_command','lex.py',150),
-  ('command -> view_command','command',1,'p_command','lex.py',151),
-  ('command -> history_command','command',1,'p_command','lex.py',152),
-  ('command -> help_command','command',1,'p_command','lex.py',153),
-  ('command -> exit_command','command',1,'p_command','lex.py',154),
-  ('identifier_list -> IDENTIFIER identifier_list','identifier_list',2,'p_identifier_list','lex.py',162),
-  ('identifier_list -> IDENTIFIER','identifier_list',1,'p_identifier_list','lex.py',163),
-  ('identifier_list -> STRING','identifier_list',1,'p_identifier_list','lex.py',164),
-  ('book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END','book_command',15,'p_book_command','lex.py',184),
-  ('book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END','book_command',16,'p_book_command','lex.py',185),
-  ('confirm_command -> KEYWORD_CONFIRM RESERVATION FOR identifier_list FOR identifier_list SYM_END','confirm_command',7,'p_confirm_command','lex.py',247),
-  ('confirm_command -> KEYWORD_CONFIRM INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END','confirm_command',8,'p_confirm_command','lex.py',248),
-  ('pay_command -> KEYWORD_PAY RESERVATION FOR identifier_list FOR identifier_list SYM_END','pay_command',7,'p_pay_command','lex.py',272),
-  ('pay_command -> KEYWORD_PAY INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END','pay_command',8,'p_pay_command','lex.py',273),
-  ('cancel_command -> KEYWORD_CANCEL RESERVATION FOR identifier_list FOR identifier_list SYM_END','cancel_command',7,'p_cancel_command','lex.py',298),
-  ('cancel_command -> KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END','cancel_command',8,'p_cancel_command','lex.py',299),
-  ('list_command -> KEYWORD_LIST identifier_list SCHEDULE SYM_END','list_command',4,'p_list_command','lex.py',321),
-  ('list_command -> KEYWORD_LIST identifier_list SCHEDULES SYM_END','list_command',4,'p_list_command','lex.py',322),
-  ('view_command -> KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END','view_command',5,'p_view_command','lex.py',339),
-  ('view_command -> KEYWORD_VIEW SCHEDULES FOR identifier_list SYM_END','view_command',5,'p_view_command','lex.py',340),
-  ('history_command -> KEYWORD_HISTORY FOR identifier_list SYM_END','history_command',4,'p_history_command','lex.py',356),
-  ('help_command -> KEYWORD_HELP SYM_END','help_command',2,'p_help_command','lex.py',364),
-  ('exit_command -> KEYWORD_EXIT SYM_END','exit_command',2,'p_exit_command','lex.py',391),
+  ('command -> book_command','command',1,'p_command','lex.py',154),
+  ('command -> confirm_command','command',1,'p_command','lex.py',155),
+  ('command -> pay_command','command',1,'p_command','lex.py',156),
+  ('command -> cancel_command','command',1,'p_command','lex.py',157),
+  ('command -> list_command','command',1,'p_command','lex.py',158),
+  ('command -> view_command','command',1,'p_command','lex.py',159),
+  ('command -> history_command','command',1,'p_command','lex.py',160),
+  ('command -> help_command','command',1,'p_command','lex.py',161),
+  ('command -> exit_command','command',1,'p_command','lex.py',162),
+  ('identifier_list -> IDENTIFIER identifier_list','identifier_list',2,'p_identifier_list','lex.py',170),
+  ('identifier_list -> IDENTIFIER','identifier_list',1,'p_identifier_list','lex.py',171),
+  ('identifier_list -> STRING','identifier_list',1,'p_identifier_list','lex.py',172),
+  ('book_command -> KEYWORD_BOOK KEYWORD_TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END','book_command',15,'p_book_command','lex.py',192),
+  ('book_command -> KEYWORD_BOOK INTEGER KEYWORD_TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END','book_command',16,'p_book_command','lex.py',193),
+  ('confirm_command -> KEYWORD_CONFIRM RESERVATION FOR identifier_list FOR identifier_list SYM_END','confirm_command',7,'p_confirm_command','lex.py',255),
+  ('confirm_command -> KEYWORD_CONFIRM INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END','confirm_command',8,'p_confirm_command','lex.py',256),
+  ('pay_command -> KEYWORD_PAY RESERVATION FOR identifier_list FOR identifier_list SYM_END','pay_command',7,'p_pay_command','lex.py',280),
+  ('pay_command -> KEYWORD_PAY INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END','pay_command',8,'p_pay_command','lex.py',281),
+  ('cancel_command -> KEYWORD_CANCEL RESERVATION FOR identifier_list FOR identifier_list SYM_END','cancel_command',7,'p_cancel_command','lex.py',306),
+  ('cancel_command -> KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END','cancel_command',8,'p_cancel_command','lex.py',307),
+  ('list_command -> KEYWORD_LIST identifier_list SCHEDULE SYM_END','list_command',4,'p_list_command','lex.py',328),
+  ('view_command -> KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END','view_command',5,'p_view_command','lex.py',346),
+  ('view_command -> KEYWORD_VIEW SCHEDULES FOR identifier_list SYM_END','view_command',5,'p_view_command','lex.py',347),
+  ('history_command -> KEYWORD_HISTORY FOR identifier_list SYM_END','history_command',4,'p_history_command','lex.py',363),
+  ('help_command -> KEYWORD_HELP SYM_END','help_command',2,'p_help_command','lex.py',371),
+  ('exit_command -> KEYWORD_EXIT SYM_END','exit_command',2,'p_exit_command','lex.py',417),
 ]
