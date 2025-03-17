@@ -1,0 +1,56 @@
+List commands:
+    Transportation (Trains, Buses, Airlines):
+        List available schedule for Knutsford Express from Montego Bay to Kingston.
+        List available tickets for train from Kingston to Spanish Town.
+        List available schedule for flight from New York to London.
+        List available tickets for bus from Ocho Rios to Negril.
+        List available schedule for Air Jamaica from Montego Bay to Miami.
+        List available schedule for train from Montego Bay to Spanish Town.
+
+    Concert Tickets:
+        List available tickets for concert Maroon 5 in Kingston.
+        List available tickets for concert Drake at Madison Square Garden.
+        List available tickets for concert Beyonce at the National Stadium.
+        List available tickets for concert Bob Marley tribute at Emancipation Park.
+
+    Football Match Tickets:
+        List available tickets for football match Real Madrid vs Barcelona.
+        List available tickets for football match Manchester United vs Liverpool.
+        List available tickets for football match Jamaica vs Canada at the National Stadium.
+        List available tickets for football match Brazil vs Argentina at Maracana Stadium.
+
+    Accommodation (Hotels, Rentals):
+        List available accommodations in Montego Bay.
+        List available rooms for hotel Hilton in Kingston.
+        List available rooms for vacation rental in Ocho Rios.
+        List available accommodations in New York City.
+
+    General Events (Theater, Shows, etc.):
+        List available tickets for event Lion King in London.
+        List available tickets for event Cirque du Soleil in Las Vegas.
+        List available tickets for event Comedy Show at the Pegasus Hotel.
+        List available tickets for event Ballet performance at the National Theatre.
+
+Booking commands:
+    Concert tickets:
+        Book ticket for concert Tyler Swift at the O2 Arena on February 17, 2025 at 8:30 AM for Jane Doe.
+
+    Transportation tickets:
+        Book ticket for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 6:00 AM for Joy Reynolds.
+
+    Accommodation tickets:
+        Book accommodation for Spanish Court Hotel in Kingston on February 17, 2025 to February 20, 2025 for Lisa Ann.
+
+    Sports tickets:
+        Book ticket for football match Real Madrid vs Barcelona on February 17, 2025 at 2:30 PM for John Doe.
+
+    General events:
+        Book ticket for event Comedy Show at the Pegasus Hotel on February 17, 2025 at 2:30 PM for John Doe.
+
+        Book ticket for event Modern Art Exhibition at the National Gallery on April 15, 2024, at 10:00 AM for Art Lovers Group.
+
+        Book ticket for event Swan Lake Ballet at the Lincoln Center on May 5, 2024 at 8:00 PM for the Thompson Family.
+
+
+
+
