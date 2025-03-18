@@ -56,3 +56,4 @@ Pipfile.lock
 
 # Ignore pytest output
 .pytest_cache/
+/src/parse-log.txt

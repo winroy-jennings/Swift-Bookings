@@ -13,6 +13,9 @@ from dotenv import load_dotenv
 # Import the tabulate module
 from tabulate import tabulate
 
+# Set up a logging object
+import logging
+
 # get api keys
 load_dotenv(dotenv_path=".env.local")
 gemini_api_key = os.getenv("GEMINI_API_KEY")
@@ -2646,8 +2649,17 @@ def p_error(p):
     )
 
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename="parse-log.txt",
+    filemode="w",
+    format="%(filename)10s:%(lineno)4d:%(message)s"
+)
+
+log = logging.getLogger()
+
 # Build the parser
-parser = yacc.yacc()
+parser = yacc.yacc(optimize=1, debug=1, debuglog=log)
 
 
 def connect_to_neon_psycopg3():
@@ -2790,7 +2802,7 @@ def main():
                 print(tok)
             print("\n")
         else:
-            result = parser.parse(input=s, lexer=lexer, debug=False)
+            result = parser.parse(input=s, lexer=lexer, debug=log)
 
             print("\n")
 
