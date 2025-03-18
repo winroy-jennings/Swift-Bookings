@@ -153,35 +153,53 @@ Cancel commands:
 
 View commands:
     General events:
-        View general event schedules for Joy Reynolds.
+        View general tickets for Joy Reynolds.
+        View general tickets for Jane Doe.
+        View general tickets for John Doe.
+        View general tickets for Lisa Ann.
+        View general tickets for Art Lovers Group.
+        View general tickets for the Thompson Family.
 
     Transportation tickets:
-        View transportation schedules for Joy Reynolds.
+        View transportation tickets for Joy Reynolds.
+        View transportation tickets for Jane Doe.
+        View transportation tickets for John Doe.
+        View transportation tickets for Lisa Ann.
+        View transportation tickets for Art Lovers Group.
+        View transportation tickets for the Thompson Family.
 
     Accommodation tickets:
-        View accommodation schedules for Joy Reynolds.
+        View accommodation tickets for Joy Reynolds.
+        View accommodation tickets for Jane Doe.
+        View accommodation tickets for John Doe.
+        View accommodation tickets for Lisa Ann.
+        View accommodation tickets for Art Lovers Group.
+        View accommodation tickets for the Thompson Family.
 
     Concert tickets:
-        View concert schedules for Joy Reynolds.
+        View concert tickets for Joy Reynolds.
+        View concert tickets for Jane Doe.
+        View concert tickets for John Doe.
+        View concert tickets for Lisa Ann.
+        View concert tickets for Art Lovers Group.
+        View concert tickets for the Thompson Family.
 
     Sports tickets:
-        View sports schedules for Joy Reynolds.
+        View sports tickets for Joy Reynolds.
+        View sports tickets for Jane Doe.
+        View sports tickets for John Doe.
+        View sports tickets for Lisa Ann.
+        View sports tickets for Art Lovers Group.
+        View sports tickets for the Thompson Family.
 
 History commands:
     General events:
-        View history of general events for Joy Reynolds.
-
-    Transportation tickets:
-        View history of transportation tickets for Joy Reynolds.
-
-    Accommodation tickets:
-        View history of accommodation tickets for Joy Reynolds.
-
-    Concert tickets:
-        View history of concert tickets for Joy Reynolds.
-
-    Sports tickets:
-        View history of sports tickets for Joy Reynolds.
+        View history for Joy Reynolds.
+        View history for Jane Doe.
+        View history for John Doe.
+        View history for Lisa Ann.
+        View history for Art Lovers Group.
+        View history for the Thompson Family.
 
 Help commands:
     View available commands.

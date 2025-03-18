@@ -10,6 +10,9 @@ import psycopg
 from google import genai
 from dotenv import load_dotenv
 
+# Import the tabulate module
+from tabulate import tabulate
+
 # get api keys
 load_dotenv(dotenv_path=".env.local")
 gemini_api_key = os.getenv("GEMINI_API_KEY")
@@ -41,15 +44,15 @@ reserved = {
     "concert": "CONCERT",
     "accommodation": "ACCOMMODATION",
     "accommodations": "ACCOMMODATIONS",
-    "room": "ROOM",
     "rooms": "ROOMS",
     "event": "EVENT",
 
     # Others
-    "reservation": "RESERVATION",
-    "reservations": "RESERVATIONS",
     "schedule": "SCHEDULE",
-    "schedules": "SCHEDULES",
+    # Others
+    "general": "GENERAL",
+    "transportation": "TRANSPORTATION",
+    "sports": "SPORTS",
 
     # Details
     "from": "FROM",
@@ -69,7 +72,6 @@ tokens = [
              # Numeric values
              "INTEGER",
              "STRING",
-             "FLOAT",
              # Identifiers
              "IDENTIFIER",
          ] + list(reserved.values())
@@ -315,11 +317,10 @@ def p_book_command(p):
             
             Ticket Type should be one of the following Types:
                 General Event
-                Transportation Ticket (Trains, Buses, Airlines)
-                Concert Ticket
-                Accommodations
-                Sports Ticket
-                Other Event
+                Transportation (Trains, Buses, Airlines, etc.)
+                Concert
+                Accommodation
+                Sports
             
             That they are booking to the JSON object.
             
@@ -386,7 +387,7 @@ def p_book_command(p):
         else:
             print("Processing...")
             # Converts response to JSON object
-            booking_data = json.loads(query)
+            booking_data: json = json.loads(query)
 
             cur.execute("SELECT user_id FROM users WHERE customer_name = %s", [booking_data['Customer Name']])
             # Gets the first element
@@ -739,7 +740,7 @@ def p_confirm_command(p):
                     concert_ticket = cur.fetchone()
 
                     if not concert_ticket:
-                        print("Concert ticket does not exist, try again!")
+                        print("General ticket does not exist, try again!")
                     else:
                         booking_id = concert_ticket[0]
 
@@ -783,7 +784,7 @@ def p_confirm_command(p):
                     concert_ticket = cur.fetchone()
 
                     if not concert_ticket:
-                        print("Concert ticket does not exist, try again!")
+                        print("Transportation ticket does not exist, try again!")
                     else:
                         booking_id = concert_ticket[0]
 
@@ -1176,7 +1177,7 @@ def p_pay_command(p):
                     concert_ticket = cur.fetchone()
 
                     if not concert_ticket:
-                        print("Concert ticket does not exist, try again!")
+                        print("General ticket does not exist, try again!")
                     else:
                         booking_id = concert_ticket[0]
 
@@ -1220,7 +1221,7 @@ def p_pay_command(p):
                     concert_ticket = cur.fetchone()
 
                     if not concert_ticket:
-                        print("Concert ticket does not exist, try again!")
+                        print("Transportation ticket does not exist, try again!")
                     else:
                         booking_id = concert_ticket[0]
 
@@ -1614,7 +1615,7 @@ def p_cancel_command(p):
                     concert_ticket = cur.fetchone()
 
                     if not concert_ticket:
-                        print("Concert ticket does not exist, try again!")
+                        print("General ticket does not exist, try again!")
                     else:
                         booking_id = concert_ticket[0]
 
@@ -1658,7 +1659,7 @@ def p_cancel_command(p):
                     concert_ticket = cur.fetchone()
 
                     if not concert_ticket:
-                        print("Concert ticket does not exist, try again!")
+                        print("Transportation ticket does not exist, try again!")
                     else:
                         booking_id = concert_ticket[0]
 
@@ -1890,7 +1891,7 @@ def p_list_command(p):
 
         query = response.text.replace("```json", "").replace("```", "").strip("\n").strip()
 
-        result = json.loads(query)
+        result: json = json.loads(query)
 
         if len(result) == 0:
             print(f"No schedules found for {p[5]}.")
@@ -1914,14 +1915,291 @@ def p_list_command(p):
 # Displays all the current schedules for a person.
 def p_view_command(p):
     """
-    view_command : KEYWORD_VIEW SCHEDULE FOR identifier_list SYM_END
-                | KEYWORD_VIEW SCHEDULES FOR identifier_list SYM_END
+    view_command : KEYWORD_VIEW GENERAL TICKETS FOR identifier_list SYM_END
+                | KEYWORD_VIEW TRANSPORTATION TICKETS FOR identifier_list SYM_END
+                | KEYWORD_VIEW ACCOMMODATION TICKETS FOR identifier_list SYM_END
+                | KEYWORD_VIEW CONCERT TICKETS FOR identifier_list SYM_END
+                | KEYWORD_VIEW SPORTS TICKETS FOR identifier_list SYM_END
     """
 
-    if p[2] == "schedule":
-        p[0] = f"View schedule for {p[4]}."
-    else:
-        p[0] = f"View schedules for {p[4]}."
+    try:
+        system_prompt = f"""
+        Tone and style instructions for the model:
+            Analyse the inputted string to extract the type of ticket and the user's name. Then return ONLY a JSON object.
+            The JSON object should have only two elements: Ticket Type and Customer Name
+            
+            Please adhere to the following guidelines:
+                Remove the ```json ``` form the JSON list. 
+                No explanation needed.
+                Capitalize the first letter of each word in the key. Remove underscore if visible then space each word.
+                
+                Example: if the user enters "View general tickets for Joy Reynolds."
+                Then return a JSON object with "Ticket Type: "General Event" and "Customer Name: "Joy Reynolds"
+                
+                Example: if the user enters "View transportation tickets for Joy Reynolds."
+                Then return a JSON object with "Ticket Type: "Transportation" and "Customer Name: "Joy Reynolds"
+                
+                Example: if the user enters "View accommodation tickets for Joy Reynolds."
+                Then return a JSON object with "Ticket Type: "Accommodation" and "Customer Name: "Joy Reynolds"
+                
+                Example: if the user enters "View concert tickets for Joy Reynolds."
+                Then return a JSON object with "Ticket Type: "Concert" and "Customer Name: "Joy Reynolds"
+                
+                Example: if the user enters "View sports tickets for Joy Reynolds."
+                Then return a JSON object with "Ticket Type: "Sports" and "Customer Name: "Joy Reynolds"
+                
+        Parse the information in the following and return a JSON object with the information in the text that follows this.
+        """
+
+        s = ' '.join(p[1:])
+
+        full_prompt = f"{system_prompt}\n\n{s}."
+
+        response = client.models.generate_content(
+            model="gemini-2.0-flash", contents=full_prompt
+        )
+
+        query = response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        print(query)
+
+        booking_details: json = json.loads(query)
+        cur = neon_db.cursor()
+
+        cur.execute("SELECT user_id FROM users WHERE customer_name = %s", (booking_details['Customer Name'],))
+        # Gets the first element
+        existing_user = cur.fetchone()
+
+        if not existing_user:
+            print("User does not exist, try again!")
+        else:
+            user_id = existing_user[0]
+            print(user_id)
+
+            if booking_details["Ticket Type"] == "General Event":
+                cur.execute(
+                    """
+                    SELECT general_events.event_name,
+                    general_events.venue,
+                    general_events.event_date,
+                    general_events.start_time,
+                    general_events.price,
+                    bookings.ticket_status,
+                    bookings.tickets_booked
+                    FROM bookings
+                    JOIN general_events ON bookings.booking_id = general_events.booking_id
+                    WHERE bookings.user_id = %s
+                    """,
+                    [user_id,
+                     ])
+
+                general_tickets = cur.fetchall()
+
+                if not general_tickets:
+                    print("General tickets does not exist, try again!")
+                else:
+                    data_list = []
+                    data = []
+
+                    for i in general_tickets:
+                        # print(i)
+                        data = []
+
+                        for j in i:
+                            data.append(j)
+                        data_list.append(data)
+
+                    # Creating a table with headers and a grid format
+                    table = tabulate(
+                        data_list,
+                        headers=["Event Name", "Venue", "Event Date", "Start Time",
+                                 "Price", "Ticket Status", "Tickets Booked"],
+                        tablefmt="grid"
+                    )
+
+                    print(table)
+            elif booking_details["Ticket Type"] == "Transportation":
+                cur.execute(
+                    """
+                    SELECT transportation_tickets.transportation_company,
+                    transportation_tickets.departure_location,
+                    transportation_tickets.arrival_location,
+                    transportation_tickets.departure_time,
+                    transportation_tickets.departure_date,
+                    transportation_tickets.seat_number,
+                    bookings.ticket_status,
+                    bookings.tickets_booked
+                    FROM bookings
+                    JOIN transportation_tickets ON bookings.booking_id = transportation_tickets.booking_id
+                    WHERE bookings.user_id = %s
+                    """,
+                    [user_id,
+                     ])
+
+                transportation_tickets = cur.fetchall()
+
+                if not transportation_tickets:
+                    print("Transportation tickets does not exist, try again!")
+                else:
+                    data_list = []
+                    data = []
+
+                    for i in transportation_tickets:
+                        # print(i)
+                        data = []
+
+                        for j in i:
+                            data.append(j)
+                        data_list.append(data)
+
+                    # Creating a table with headers and a grid format
+                    table = tabulate(
+                        data_list,
+                        headers=["Transportation Company", "Departure Location", "Arrival Location", "Departure Time",
+                                 "Departure Date", "Seat Number", "Ticket Status", "Tickets Booked"],
+                        tablefmt="grid"
+                    )
+
+                    print(table)
+            elif booking_details["Ticket Type"] == "Accommodation":
+                cur.execute(
+                    """
+                    SELECT accommodations.property_name,
+                    accommodations.location,
+                    accommodations.room_number,
+                    accommodations.check_in_date,
+                    accommodations.check_out_date,
+                    accommodations.check_in_time,
+                    accommodations.room_type_unit_type,
+                    accommodations.price_per_night,
+                    bookings.ticket_status,
+                    bookings.tickets_booked
+                    FROM bookings
+                    JOIN accommodations ON bookings.booking_id = accommodations.booking_id
+                    WHERE bookings.user_id = %s
+                    """,
+                    [user_id,
+                     ])
+
+                accommodation_tickets = cur.fetchall()
+
+                if not accommodation_tickets:
+                    print("Transportation tickets does not exist, try again!")
+                else:
+                    data_list = []
+                    data = []
+
+                    for i in accommodation_tickets:
+                        # print(i)
+                        data = []
+
+                        for j in i:
+                            data.append(j)
+                        data_list.append(data)
+
+                    # Creating a table with headers and a grid format
+                    table = tabulate(
+                        data_list,
+                        headers=["Property Name", "Location", "Room Number", "Check-in Date",
+                                 "Check-out Date", "Check-in Time", "Room Type/Unit Type", "Price Per Night",
+                                 "Ticket Status", "Tickets Booked"],
+                        tablefmt="grid"
+                    )
+
+                    print(table)
+            elif booking_details["Ticket Type"] == "Concert":
+                cur.execute(
+                    """
+                    SELECT concert_tickets.event_name,
+                    concert_tickets.venue,
+                    concert_tickets.location,
+                    concert_tickets.event_date,
+                    concert_tickets.start_time,
+                    concert_tickets.seat_number,
+                    concert_tickets.price,
+                    bookings.ticket_status,
+                    bookings.tickets_booked
+                    FROM bookings
+                    JOIN concert_tickets ON bookings.booking_id = concert_tickets.booking_id
+                    WHERE bookings.user_id = %s
+                    """,
+                    [user_id,
+                     ])
+
+                concert_tickets = cur.fetchall()
+
+                if not concert_tickets:
+                    print("Concert tickets does not exist, try again!")
+                else:
+                    data_list = []
+                    data = []
+
+                    for i in concert_tickets:
+                        # print(i)
+                        data = []
+
+                        for j in i:
+                            data.append(j)
+                        data_list.append(data)
+
+                    # Creating a table with headers and a grid format
+                    table = tabulate(
+                        data_list,
+                        headers=["Event Name", "Venue", "Location", "Event Date", "Start Time", "Seat Number",
+                                 "Price", "Ticket Status", "Tickets Booked"],
+                        tablefmt="grid"
+                    )
+
+                    print(table)
+            elif booking_details["Ticket Type"] == "Sports":
+                cur.execute(
+                    """
+                    SELECT sports_tickets.teams,
+                    sports_tickets.stadium,
+                    sports_tickets.event_date,
+                    sports_tickets.start_time,
+                    sports_tickets.seat_location,
+                    sports_tickets.price,
+                    sports_tickets.seat_number,
+                    bookings.ticket_status,
+                    bookings.tickets_booked
+                    FROM bookings
+                    JOIN sports_tickets ON bookings.booking_id = sports_tickets.booking_id
+                    WHERE bookings.user_id = %s
+                    """,
+                    [user_id,
+                     ])
+
+                concert_tickets = cur.fetchall()
+
+                if not concert_tickets:
+                    print("Sports tickets does not exist, try again!")
+                else:
+                    data_list = []
+                    data = []
+
+                    for i in concert_tickets:
+                        # print(i)
+                        data = []
+
+                        for j in i:
+                            data.append(j)
+                        data_list.append(data)
+
+                    # Creating a table with headers and a grid format
+                    table = tabulate(
+                        data_list,
+                        headers=["Teams", "Stadium", "Event Date", "Start Time", "Seat Location", "Price",
+                                 "Seat Number", "Ticket Status", "Tickets Booked"],
+                        tablefmt="grid"
+                    )
+
+                    print(table)
+
+        p[0] = s
+    except json.JSONDecodeError as e:
+        print(f"JSON Error: {e}")
+    # except Exception as e:
+    #     print(f"Error: {e}")
 
 
 # Views all the schedules for a person.
