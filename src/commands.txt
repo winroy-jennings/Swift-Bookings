@@ -4,20 +4,16 @@ List commands:
         List available tickets for train from Kingston to Spanish Town.
         List available schedule for flight from New York to London.
         List available tickets for bus from Ocho Rios to Negril.
-        List available schedule for Air Jamaica from Montego Bay to Miami.
-        List available schedule for train from Montego Bay to Spanish Town.
 
     Concert Tickets:
         List available tickets for concert Maroon 5 in Kingston.
         List available tickets for concert Drake at Madison Square Garden.
-        List available tickets for concert Beyonce at the National Stadium.
+        List available tickets for concert Beyoncé at the National Stadium.
         List available tickets for concert Bob Marley tribute at Emancipation Park.
 
-    Football Match Tickets:
+    Sports Match Tickets:
         List available tickets for football match Real Madrid vs Barcelona.
-        List available tickets for football match Manchester United vs Liverpool.
         List available tickets for football match Jamaica vs Canada at the National Stadium.
-        List available tickets for football match Brazil vs Argentina at Maracana Stadium.
 
     Accommodation (Hotels, Rentals):
         List available accommodations in Montego Bay.
@@ -203,6 +199,10 @@ History commands:
 
 Help commands:
     Help.
+
+Clear commands:
+    Clear.
+    Cls.
 
 Exit commands:
     Exit.

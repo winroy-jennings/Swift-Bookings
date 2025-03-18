@@ -2511,43 +2511,140 @@ def p_help_command(p):
 
     if len(p) == 3:
         p[0] = f"""
-        Displaying available commands:
+        book_command: hint - Book tickets for various events
+            General events:
+                Book ticket for event <event_name> at <location> on <date> at <time> for <identifier>.
+                Book <integer> tickets for event <event_name> at <location> on <date> at <time> for <identifier>.
+                
+            Concert tickets: 
+                Book ticket for concert <artist> at <venue> on <date> at <time> for <identifier>.
+                Book <integer> tickets for concert <artist> at <venue> on <date> at <time> for <identifier>.
+        
+            Transportation tickets:
+                Book ticket for <transportation> from <start_location> to <end_location> on <date> at <time> for <identifier>.
+                Book <integer> tickets for <transportation> from <start_location> to <end_location> on <date> at <time> for <identifier>.
+        
+            Accommodation tickets: 
+                Book accommodation for <property_name> in <location> on <check_in_date> to <check_out_date> at <check_in_time> for <identifier>.
+                Book <integer> accommodations for <property_name> in <location> on <check_in_date> to <check_out_date> at <check_in_time> for <identifier>.
+        
+            Sports tickets: 
+                Book ticket for football match <teams> on <date> at <time> for <identifier>.
+                Book <integer> tickets for football match <teams> on <date> at <time> for <identifier>.
 
-        book_command:
-            Book ticket for <service> from <location> to <location> on <date> at <time> for <person>.
-            Book <number> tickets for <service> from <location> to <location> on <date> at <time> for <person>.
+        confirm_command: hint - Confirm ticket(s) that a user has booked
+            Concert tickets:
+                Confirm ticket for concert <artist> at <venue> on <date> at <time> for <identifier>.
+                Confirm <integer> tickets for concert <artist> at <venue> on <date> at <time> for <identifier>.
+        
+            Transportation tickets:
+                Confirm ticket for <transportation> from <start_location> to <end_location> on <date> at <time> for <identifier>.
+                Confirm <integer> tickets for <transportation> from <start_location> to <end_location> on <date> at <time> for <identifier>.
+        
+            Accommodation tickets:
+                Confirm accommodation for <property_name> in <location> on <check_in_date> to <check_out_date> at <check_in_time> for <identifier>.
+                Confirm <integer> accommodations for <property_name> in <location> on <check_in_date> to <check_out_date> at <check_in_time> for <identifier>.
+        
+            Sports tickets:
+                Confirm ticket for football match <teams> on <date> at <time> for <identifier>.
+                Confirm <integer> tickets for football match <teams> on <date> at <time> for <identifier>.
+        
+            General events:
+                Confirm ticket for event <event_name> at <location> on <date> at <time> for <identifier>.
+                Confirm <integer> tickets for event <event_name> at <location> on <date> at <time> for <identifier>.
+        
+        pay_command: hint - Pay for ticket(s) that a user has booked
+            Concert tickets:
+                Pay ticket for concert <artist> at <venue> on <date> at <time> for <identifier>.
+                Pay <integer> tickets for concert <artist> at <venue> on <date> at <time> for <identifier>.
+        
+            Transportation tickets:
+                Pay ticket for <transportation> from <start_location> to <end_location> on <date> at <time> for <identifier>.
+                Pay <integer> tickets for <transportation> from <start_location> to <end_location> on <date> at <time> for <identifier>.
+        
+            Accommodation tickets:
+                Pay accommodation for <property_name> in <location> on <check_in_date> to <check_out_date> at <check_in_time> for <identifier>.
+                Pay <integer> accommodations for <property_name> in <location> on <check_in_date> to <check_out_date> at <check_in_time> for <identifier>.
+        
+            Sports tickets:
+                Pay ticket for football match <teams> on <date> at <time> for <identifier>.
+                Pay <integer> tickets for football match <teams> on <date> at <time> for <identifier>.
+        
+            General events:
+                Pay ticket for event <event_name> at <location> on <date> at <time> for <identifier>.
+                Pay <integer> tickets for event <event_name> at <location> on <date> at <time> for <identifier>.
 
-        confirm_command:
-            Confirm reservation for <service> for <person>.
-            Confirm <number> reservations for <service> for <person>.
+        cancel_command: hint - Cancel booked ticket(s) for a user
+            Concert tickets:
+                Cancel ticket for concert <artist> at <venue> on <date> at <time> for <identifier>.
+                Cancel <integer> tickets for concert <artist> at <venue> on <date> at <time> for <identifier>.
+        
+            Transportation tickets:
+                Cancel ticket for <transportation> from <start_location> to <end_location> on <date> at <time> for <identifier>.
+                Cancel <integer> tickets for <transportation> from <start_location> to <end_location> on <date> at <time> for <identifier>.
+        
+            Accommodation tickets:
+                Cancel accommodation for <property_name> in <location> on <check_in_date> to <check_out_date> at <check_in_time> for <identifier>.
+                Cancel <integer> accommodations for <property_name> in <location> on <check_in_date> to <check_out_date> at <check_in_time> for <identifier>.
+        
+            Sports tickets:
+                Cancel ticket for football match <teams> on <date> at <time> for <identifier>.
+                Cancel <integer> tickets for football match <teams> on <date> at <time> for <identifier>.
+        
+            General events:
+                Cancel ticket for event <event_name> at <location> on <date> at <time> for <identifier>.
+                Cancel <integer> tickets for event <event_name> at <location> on <date> at <time> for <identifier>.
 
-        pay_command:
-            Pay <number> reservations for <identifiers> for <identifiers>.
+        list_command: hint - Lists available tickets for various events
+            General Events (Theater, Shows, etc.):
+                List available tickets for <event> in <city>.
+            
+            Transportation (Trains, Buses, Airlines):
+                List available schedule for <transportation> from <start_location> to <end_location>.
+        
+            Concert Tickets:
+                List available tickets for concert <artist> in <city>.
+        
+            Sports Match Tickets (Football, Basketball, Volleyball, Baseball):
+                List available tickets for <sport> match <team> vs <opponent_team>..
+        
+            Accommodation (Hotels, Rentals):
+                List available accommodations in <city>.
+                List available rooms for <hotel_name> in <city>.
 
-        cancel_command:
-            Cancel reservation for <identifiers> for <identifiers>.
-            Cancel <number> reservations for <identifiers> for <identifiers>.
+        view_command: hint - Lists the tickets that the user has booked
+            General events: 
+                View general tickets for <user_name>.
+        
+            Transportation tickets: 
+                View transportation tickets for <user_name>.
+        
+            Accommodation tickets:
+                View accommodation tickets for <user_name>.
+        
+            Concert tickets:
+                View concert tickets for <user_name>. 
+        
+            Sports tickets:
+                View sports tickets for <user_name>.
 
-        list_command:
-            List available schedule for <identifiers>.
-            List available schedules for <identifiers>.
-
-        view_command:
-            View schedule for <identifiers>.
-            View schedules for <identifiers>.
-
-        history_command:
-            History for <identifiers>.
-
-        help_command:
-            Display this help message.
+        history_command: hint - Displays all the tickets that a user has booked
+            History for <user_name>.
 
         exit_command:
             Exit.
 
-        clear_command:
+        clear_command: hint - Clears the screen
             Clear.
             Cls.
+        
+        Exit Commands: hint - Exits the system
+            Exit.
+        
+        Compiler Commands: hint - Enables and disables the lexical and syntax analysis
+            stat lex_mode
+            set lex_mode True
+            set lex_mode False
         """
 
 
