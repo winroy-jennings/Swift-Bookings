@@ -194,14 +194,23 @@ View commands:
 
 History commands:
     General events:
-        View history for Joy Reynolds.
-        View history for Jane Doe.
-        View history for John Doe.
-        View history for Lisa Ann.
-        View history for Art Lovers Group.
-        View history for the Thompson Family.
+        History for Joy Reynolds.
+        History for Jane Doe.
+        History for John Doe.
+        History for Lisa Ann.
+        History for Art Lovers Group.
+        History for the Thompson Family.
 
 Help commands:
-    View available commands.
+    Help.
 
+Exit commands:
+    Exit.
+
+Complete commands:
+    set lex_mode True
+    set lex_mode False
+
+Error commands:
+    View tickets concert for Jane Doe.
 

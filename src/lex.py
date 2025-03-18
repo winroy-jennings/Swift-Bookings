@@ -267,6 +267,7 @@ def p_book_command(p):
                     Ticket Type
                     Price (Assign price for that available seat; i.e: "$150.00")
                     Available Tickets
+                    Tickets Booked
                     
                 For "Transportation Ticket"
                     Customer Name
@@ -277,6 +278,7 @@ def p_book_command(p):
                     Date
                     Ticket Type
                     Seat Number (Assign any available seat)
+                    Tickets Booked
                 
                 For "Concert Ticket"
                     Customer Name
@@ -288,6 +290,7 @@ def p_book_command(p):
                     Ticket Type
                     Seat Number (Assign any available seat)
                     Price (Assign price for that available seat; i.e: "$150.00")
+                    Tickets Booked
                 
                 For "Accommodations" (Assign a room that is available and matches the user specification)
                     Customer Name
@@ -314,6 +317,7 @@ def p_book_command(p):
                     Price (Assign price for that available seat; i.e: "$150.00")
                     Seat Number (Assign any available seat number)
                     Ticket Type
+                    Tickets Booked
             
             Ticket Type should be one of the following Types:
                 General Event
@@ -1218,12 +1222,12 @@ def p_pay_command(p):
                          booking_data["Date"],
                          ])
 
-                    concert_ticket = cur.fetchone()
+                    transportation_ticket = cur.fetchone()
 
-                    if not concert_ticket:
+                    if not transportation_ticket:
                         print("Transportation ticket does not exist, try again!")
                     else:
-                        booking_id = concert_ticket[0]
+                        booking_id = transportation_ticket[0]
 
                         cur.execute(
                             """
@@ -1934,19 +1938,19 @@ def p_view_command(p):
                 Capitalize the first letter of each word in the key. Remove underscore if visible then space each word.
                 
                 Example: if the user enters "View general tickets for Joy Reynolds."
-                Then return a JSON object with "Ticket Type: "General Event" and "Customer Name: "Joy Reynolds"
+                Then return a JSON object with "Ticket Type" : "General Event" and "Customer Name" : "Joy Reynolds"
                 
                 Example: if the user enters "View transportation tickets for Joy Reynolds."
-                Then return a JSON object with "Ticket Type: "Transportation" and "Customer Name: "Joy Reynolds"
+                Then return a JSON object with "Ticket Type" : "Transportation" and "Customer Name" : "Joy Reynolds"
                 
                 Example: if the user enters "View accommodation tickets for Joy Reynolds."
-                Then return a JSON object with "Ticket Type: "Accommodation" and "Customer Name: "Joy Reynolds"
+                Then return a JSON object with "Ticket Type" : "Accommodation" and "Customer Name" : "Joy Reynolds"
                 
                 Example: if the user enters "View concert tickets for Joy Reynolds."
-                Then return a JSON object with "Ticket Type: "Concert" and "Customer Name: "Joy Reynolds"
+                Then return a JSON object with "Ticket Type" : "Concert" and "Customer Name: "Joy Reynolds"
                 
                 Example: if the user enters "View sports tickets for Joy Reynolds."
-                Then return a JSON object with "Ticket Type: "Sports" and "Customer Name: "Joy Reynolds"
+                Then return a JSON object with "Ticket Type" : "Sports" and "Customer Name" : "Joy Reynolds"
                 
         Parse the information in the following and return a JSON object with the information in the text that follows this.
         """
@@ -1960,7 +1964,7 @@ def p_view_command(p):
         )
 
         query = response.text.replace("```json", "").replace("```", "").strip("\n").strip()
-        print(query)
+        # print(query)
 
         booking_details: json = json.loads(query)
         cur = neon_db.cursor()
@@ -1973,7 +1977,7 @@ def p_view_command(p):
             print("User does not exist, try again!")
         else:
             user_id = existing_user[0]
-            print(user_id)
+            # print(user_id)
 
             if booking_details["Ticket Type"] == "General Event":
                 cur.execute(
@@ -2083,7 +2087,7 @@ def p_view_command(p):
                 accommodation_tickets = cur.fetchall()
 
                 if not accommodation_tickets:
-                    print("Transportation tickets does not exist, try again!")
+                    print("Accommodation tickets does not exist, try again!")
                 else:
                     data_list = []
                     data = []
@@ -2198,8 +2202,8 @@ def p_view_command(p):
         p[0] = s
     except json.JSONDecodeError as e:
         print(f"JSON Error: {e}")
-    # except Exception as e:
-    #     print(f"Error: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
 
 
 # Views all the schedules for a person.
@@ -2208,7 +2212,296 @@ def p_history_command(p):
     history_command : KEYWORD_HISTORY FOR identifier_list SYM_END
     """
 
-    p[0] = f"History for {p[3]}."
+    try:
+        system_prompt = f"""
+        Tone and style instructions for the model:
+            Analyse the inputted string to extract the user's name. Then return ONLY a JSON object.
+            The JSON object should have only one elements: Customer Name
+
+            Please adhere to the following guidelines:
+                Remove the ```json ``` form the JSON list. 
+                No explanation needed.
+                Capitalize the first letter of each word in the key. Remove underscore if visible then space each word.
+
+                Example: if the user enters "History for Joy Reynolds."
+                Then return a JSON object with "Customer Name": "Joy Reynolds"
+
+                Example: if the user enters "History for Jane Doe."
+                Then return a JSON object with "Customer Name" : "Jane Doe"
+
+                Example: if the user enters "History for John Doe."
+                Then return a JSON object with "Customer Name" : "John Doe"
+
+                Example: if the user enters "History for Lisa Ann."
+                Then return a JSON object with "Customer Name" : "Lisa Ann"
+
+                Example: if the user enters "History for Art Lovers Group."
+                Then return a JSON object with "Customer Name" : "Art Lovers Group"
+                
+                Example: if the user enters "History for the Thompson Family."
+                Then return a JSON object with "Customer Name" : "Thompson Family"
+
+        Parse the information in the following and return a JSON object with the information in the text that follows this.
+        """
+
+        s = ' '.join(p[1:])
+
+        full_prompt = f"{system_prompt}\n\n{s}."
+
+        response = client.models.generate_content(
+            model="gemini-2.0-flash", contents=full_prompt
+        )
+
+        query = response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        # print(query)
+
+        booking_details: json = json.loads(query)
+        cur = neon_db.cursor()
+
+        cur.execute("SELECT user_id FROM users WHERE customer_name = %s", (booking_details['Customer Name'],))
+        # Gets the first element
+        existing_user = cur.fetchone()
+
+        if not existing_user:
+            print("User does not exist.\n")
+        else:
+            user_id = existing_user[0]
+            # print(user_id)
+
+            print("General history:")
+
+            cur.execute(
+                """
+                SELECT general_events.event_name,
+                general_events.venue,
+                general_events.event_date,
+                general_events.start_time,
+                general_events.price,
+                bookings.ticket_status,
+                bookings.tickets_booked
+                FROM bookings
+                JOIN general_events ON bookings.booking_id = general_events.booking_id
+                WHERE bookings.user_id = %s
+                """,
+                [user_id,
+                 ])
+
+            general_tickets = cur.fetchall()
+
+            if not general_tickets:
+                print("\tGeneral tickets does not exist.\n")
+            else:
+                data_list = []
+                data = []
+
+                for i in general_tickets:
+                    # print(i)
+                    data = []
+
+                    for j in i:
+                        data.append(j)
+                    data_list.append(data)
+
+                # Creating a table with headers and a grid format
+                table = tabulate(
+                    data_list,
+                    headers=["Event Name", "Venue", "Event Date", "Start Time",
+                             "Price", "Ticket Status", "Tickets Booked"],
+                    tablefmt="grid"
+                )
+
+                print(table, "\n")
+
+            print("Transportation history:")
+
+            cur.execute(
+                """
+                SELECT transportation_tickets.transportation_company,
+                transportation_tickets.departure_location,
+                transportation_tickets.arrival_location,
+                transportation_tickets.departure_time,
+                transportation_tickets.departure_date,
+                transportation_tickets.seat_number,
+                bookings.ticket_status,
+                bookings.tickets_booked
+                FROM bookings
+                JOIN transportation_tickets ON bookings.booking_id = transportation_tickets.booking_id
+                WHERE bookings.user_id = %s
+                """,
+                [user_id,
+                 ])
+
+            transportation_tickets = cur.fetchall()
+
+            if not transportation_tickets:
+                print("\tTransportation tickets does not exist.\n")
+            else:
+                data_list = []
+                data = []
+
+                for i in transportation_tickets:
+                    # print(i)
+                    data = []
+
+                    for j in i:
+                        data.append(j)
+                    data_list.append(data)
+
+                # Creating a table with headers and a grid format
+                table = tabulate(
+                    data_list,
+                    headers=["Transportation Company", "Departure Location", "Arrival Location", "Departure Time",
+                             "Departure Date", "Seat Number", "Ticket Status", "Tickets Booked"],
+                    tablefmt="grid"
+                )
+
+                print(table, "\n")
+
+            print("Accommodation history:")
+
+            cur.execute(
+                """
+                SELECT accommodations.property_name,
+                accommodations.location,
+                accommodations.room_number,
+                accommodations.check_in_date,
+                accommodations.check_out_date,
+                accommodations.check_in_time,
+                accommodations.room_type_unit_type,
+                accommodations.price_per_night,
+                bookings.ticket_status,
+                bookings.tickets_booked
+                FROM bookings
+                JOIN accommodations ON bookings.booking_id = accommodations.booking_id
+                WHERE bookings.user_id = %s
+                """,
+                [user_id,
+                 ])
+
+            accommodation_tickets = cur.fetchall()
+
+            if not accommodation_tickets:
+                print("\tAccommodation tickets does not exist.\n")
+            else:
+                data_list = []
+                data = []
+
+                for i in accommodation_tickets:
+                    # print(i)
+                    data = []
+
+                    for j in i:
+                        data.append(j)
+                    data_list.append(data)
+
+                # Creating a table with headers and a grid format
+                table = tabulate(
+                    data_list,
+                    headers=["Property Name", "Location", "Room Number", "Check-in Date",
+                             "Check-out Date", "Check-in Time", "Room Type/Unit Type", "Price Per Night",
+                             "Ticket Status", "Tickets Booked"],
+                    tablefmt="grid"
+                )
+
+                print(table, "\n")
+
+            print("Concert history:")
+
+            cur.execute(
+                """
+                SELECT concert_tickets.event_name,
+                concert_tickets.venue,
+                concert_tickets.location,
+                concert_tickets.event_date,
+                concert_tickets.start_time,
+                concert_tickets.seat_number,
+                concert_tickets.price,
+                bookings.ticket_status,
+                bookings.tickets_booked
+                FROM bookings
+                JOIN concert_tickets ON bookings.booking_id = concert_tickets.booking_id
+                WHERE bookings.user_id = %s
+                """,
+                [user_id,
+                 ])
+
+            concert_tickets = cur.fetchall()
+
+            if not concert_tickets:
+                print("\tConcert tickets does not exist.\n")
+            else:
+                data_list = []
+                data = []
+
+                for i in concert_tickets:
+                    # print(i)
+                    data = []
+
+                    for j in i:
+                        data.append(j)
+                    data_list.append(data)
+
+                # Creating a table with headers and a grid format
+                table = tabulate(
+                    data_list,
+                    headers=["Event Name", "Venue", "Location", "Event Date", "Start Time", "Seat Number",
+                             "Price", "Ticket Status", "Tickets Booked"],
+                    tablefmt="grid"
+                )
+
+                print(table, "\n")
+
+            print("Sports history:")
+
+            cur.execute(
+                """
+                SELECT sports_tickets.teams,
+                sports_tickets.stadium,
+                sports_tickets.event_date,
+                sports_tickets.start_time,
+                sports_tickets.seat_location,
+                sports_tickets.price,
+                sports_tickets.seat_number,
+                bookings.ticket_status,
+                bookings.tickets_booked
+                FROM bookings
+                JOIN sports_tickets ON bookings.booking_id = sports_tickets.booking_id
+                WHERE bookings.user_id = %s
+                """,
+                [user_id,
+                 ])
+
+            concert_tickets = cur.fetchall()
+
+            if not concert_tickets:
+                print("\tSports tickets does not exist.\n")
+            else:
+                data_list = []
+                data = []
+
+                for i in concert_tickets:
+                    # print(i)
+                    data = []
+
+                    for j in i:
+                        data.append(j)
+                    data_list.append(data)
+
+                # Creating a table with headers and a grid format
+                table = tabulate(
+                    data_list,
+                    headers=["Teams", "Stadium", "Event Date", "Start Time", "Seat Location", "Price",
+                             "Seat Number", "Ticket Status", "Tickets Booked"],
+                    tablefmt="grid"
+                )
+
+                print(table, "\n")
+
+        p[0] = s
+    except json.JSONDecodeError as e:
+        print(f"JSON Error: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
 
 
 def p_help_command(p):
@@ -2397,12 +2690,12 @@ def main():
                 print("Compiler Status: Lexical analysis mode enabled.")
                 print("Compiler Status: Syntax analysis mode disabled.\n")
                 continue
-        elif s.lower() == "set lex_mode=true":
+        elif s.lower() == "set lex_mode true":
             lexical_mode = True
             print("Compiler Status: Lexical analysis mode enabled.")
             print("Compiler Status: Syntax analysis mode disabled.\n")
             continue
-        elif s.lower() == "set lex_mode=false":
+        elif s.lower() == "set lex_mode false":
             lexical_mode = False
             print("Compiler Status: Lexical analysis mode disabled.")
             print("Compiler Status: Syntax analysis mode enabled.\n")
