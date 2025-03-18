@@ -133,9 +133,9 @@ Cancel commands:
         Cancel 5 tickets for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 6:00 AM for Joy Reynolds.
 
     Accommodation tickets:
-        Cancel accommodation for Spanish Court Hotel in Kingston on February 17, 2025 to February 20, 2025 for Lisa Ann.
+        Cancel accommodation for Spanish Court Hotel in Kingston on February 17, 2025 to February 20, 2025 at 6:00 AM for Lisa Ann.
 
-        Cancel 10 accommodations for Spanish Court Hotel in Kingston on February 17, 2025 to February 20, 2025 for Lisa Ann.
+        Cancel 10 accommodations for Spanish Court Hotel in Kingston on February 17, 2025 to February 20, 2025 at 6:00 AM for Lisa Ann.
 
     Sports tickets:
         Cancel ticket for football match Real Madrid vs Barcelona on February 17, 2025 at 2:30 PM for John Doe.

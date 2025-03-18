@@ -1393,19 +1393,439 @@ def p_pay_command(p):
 # Cancel reservations for a particular person.
 def p_cancel_command(p):
     """
-    cancel_command : KEYWORD_CANCEL RESERVATION FOR identifier_list FOR identifier_list SYM_END
-                    | KEYWORD_CANCEL INTEGER RESERVATIONS FOR identifier_list FOR identifier_list SYM_END
+    cancel_command : KEYWORD_CANCEL TICKET FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                | KEYWORD_CANCEL INTEGER TICKETS FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+
+                | KEYWORD_CANCEL TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                | KEYWORD_CANCEL INTEGER TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+
+                | KEYWORD_CANCEL TICKET FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                | KEYWORD_CANCEL INTEGER TICKETS FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+
+                | KEYWORD_CANCEL TICKET FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                | KEYWORD_CANCEL INTEGER TICKETS FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+
+                | KEYWORD_CANCEL TICKET FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                | KEYWORD_CANCEL INTEGER TICKETS FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+
+                | KEYWORD_CANCEL ACCOMMODATION FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
+                | KEYWORD_CANCEL INTEGER ACCOMMODATIONS FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
     """
 
-    if type(p[2]) is int:
-        if p[2] < 1:
-            print(
-                "Error: The number of reservations MUST be a positive number. Great than 0!"
-            )
+    try:
+        # Return a new `Cursor` to send commands and queries to the connection
+        cur = neon_db.cursor()
+
+        # Checks if the second token in the input is of type integer
+        if type(p[2]) is int:
+            # Converts the second token to type string
+            s = f"{p[1]} {str(p[2])}"
+
+            # Concatenates the rest of the tokens
+            for i in p[3:]:
+                if i != ".":
+                    if i != p[1]:
+                        s += f" {i}"
+                    else:
+                        s += f"{i}"
+                else:
+                    s += f"{i}"
         else:
-            p[0] = f"Cancel {p[2]} reservations for {p[5]} for {p[7]}."
-    else:
-        p[0] = f"Cancel reservation for {p[4]} for {p[6]}."
+            s = ""
+
+            # Concatenates the rest of the tokens
+            for i in p[1:]:
+                if i != ".":
+                    if i != p[1]:
+                        s += f" {i}"
+                    else:
+                        s += f"{i}"
+                else:
+                    s += f"{i}"
+
+        # tone and style instruction for gemini
+        system_prompt = f"""
+        Tone and style instructions for the model:
+            When responding to user queries about booking tickets for various events (e.g., events, transportation, accommodations, concert, tickets).
+
+            These are the criteria:
+
+            Then, check to see if the booking details are correct.
+            i.e: If the user entered - "Book ticket for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 1:15 PM for Joy Reynolds."
+
+            Check Knutsford Express schedule if there is a Departure Time for Montego Bay to Kingston on February 17, 2025 at 1:15 PM
+
+            Also validate the DATE if a date was provided: If the user enter a date that is not valid then return a string instead of a JSON object
+            Saying: "Error: Invalid date format"
+
+            CHeck the user user enter a name to whom the tickets are being booked for.
+            i.e: Book ticket for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 2:13 AM for Joy Reynolds.
+
+            Here the tickets are being booked for "Joy Reynolds"
+
+            Else, return a string instead of a JSON object saying: "Error: A name was not entered to whom the tickets should be booked for."
+
+            If there exist a bus for this information,
+            then return a JSON object of all the available information that is required for the service in question
+            add the users' name and type of ticket. Such as:
+
+            For the keys in the JSON object. Return, if:
+                Number of tickets book in the JSON object. If the number was not specified then return "1".
+                i.e:  "Tickets Booked" : "1"
+
+                For "General Event"
+                    Customer Name
+                    Event Name
+                    Venue
+                    Date (Date format, i.e: 2025-02-17)
+                    Time (24-hour format, i.e: 06:00:00)
+                    Ticket Type
+                    Price (i.e: "$150.00")
+                    Available Tickets
+                    Tickets Booked
+
+                For "Transportation Ticket"
+                    Customer Name
+                    Transportation Company
+                    Departure Location (City, Country)
+                    Arrival Location (City, Country)
+                    Departure Time (24-hour format, i.e: 06:00:00)
+                    Date (Date format, i.e: 2025-02-17)
+                    Ticket Type
+                    Tickets Booked
+
+                For "Concert Ticket"
+                    Customer Name
+                    Event Name (Just the name without "Concert" appended to it)
+                    Venue
+                    Location (City, Country)
+                    Date
+                    Time
+                    Ticket Type
+                    Seat Number
+                    Price (i.e: "$150.00")
+                    Tickets Booked
+
+                For "Accommodations" (Assign a room that is available and matches the user specification)
+                    Customer Name
+                    Property Name
+                    Location (City, Country, i.e: Kingston, Jamaica)
+                    Room number
+                    Check In Date (Date format, i.e: 2025-02-17)
+                    Check Out Date (Date format, i.e: 2025-02-17)
+                    Check In Time (24-hour format, i.e: 06:00:00)
+                    Room Type Unit Type
+                    Price Per Night (i.e: "$150.00")
+                    Available Rooms Units
+                    Ticket Type
+                    Tickets Booked
+
+                For "Sports Ticket"
+                    Customer Name
+                    Teams
+                    Stadium
+                    Date Date format, i.e: 2025-02-17)
+                    Start Time (24-hour format, i.e: 06:00:00)
+                    Seat Location
+                    Price (i.e: "$150.00")
+                    Seat Number
+                    Ticket Type
+                    Tickets Booked
+
+            Ticket Type should be one of the following Types:
+                General Event
+                Transportation Ticket (Trains, Buses, Airlines)
+                Concert Ticket
+                Accommodations
+                Sports Ticket
+                Other Event
+
+            That they are booking to the JSON object.
+
+            If the booking details are incorrect, then return an empty JSON object. 
+
+            Based on the availability of the tickets.
+            return a response based on the following criteria:
+
+            Please adhere to the following guidelines:
+            Return just the JSON object of all the available information that is required for the service in question.
+            Remove the ```json ``` form the JSON object. 
+            No explanation needed.
+
+            If no schedules or events are found then JUST return an empty JSON object.
+            Capitalize the first letter of each word in the key. Remove underscore if visible then space each word.
+        """
+
+        # Concatenates the instruction and user input
+        full_prompt = f"{system_prompt}\n\n{s}."
+
+        # Send a request to gemini
+        response = client.models.generate_content(
+            model="gemini-2.0-flash", contents=full_prompt
+        )
+
+        # Cleanup response returned from gemini
+        query = response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        # print(query)
+
+        # Check for errors
+        if query == "Error: Invalid date format":
+            print("DATABASE QUERY")
+        elif query == "Error: A name was not entered to whom the tickets should be booked for.":
+            print("Error: Name missing")
+        else:
+            print("Processing...")
+            # Converts response to JSON object
+            booking_data: json = json.loads(query)
+
+            cur.execute("SELECT user_id FROM users WHERE customer_name = %s", (booking_data['Customer Name'],))
+            # Gets the first element
+            existing_user = cur.fetchone()
+
+            if not existing_user:
+                print("User does not exist, try again!")
+            else:
+                user_id = existing_user[0]
+                # print(f"USER ID: {user_id}")
+                # print(f"Type: {booking_data["Ticket Type"]}")
+                # print(f"Tickets Booked: {booking_data["Tickets Booked"]}")
+
+                if booking_data["Ticket Type"] == "General Event":
+                    cur.execute(
+                        """
+                        SELECT *
+                        FROM bookings
+                        JOIN general_events ON bookings.booking_id = general_events.booking_id
+                        WHERE user_id = %s
+                        AND bookings.tickets_booked = %s
+                        AND general_events.event_name = %s
+                        AND general_events.venue = %s
+                        AND general_events.event_date = %s
+                        AND general_events.start_time = %s
+                        """,
+                        [user_id,
+                         booking_data["Tickets Booked"],
+                         booking_data["Event Name"],
+                         booking_data["Venue"],
+                         booking_data["Date"],
+                         booking_data["Time"],
+                         ])
+
+                    concert_ticket = cur.fetchone()
+
+                    if not concert_ticket:
+                        print("Concert ticket does not exist, try again!")
+                    else:
+                        booking_id = concert_ticket[0]
+
+                        cur.execute(
+                            """
+                            UPDATE bookings
+                            SET ticket_status = %s
+                            WHERE booking_id = %s
+                            AND user_id = %s
+                            """,
+                            ["Cancelled",
+                             booking_id,
+                             user_id,
+                             ]
+                        )
+
+                        neon_db.commit()
+                elif booking_data["Ticket Type"] == "Transportation Ticket":
+                    cur.execute(
+                        """
+                        SELECT *
+                        FROM bookings
+                        JOIN transportation_tickets ON bookings.booking_id = transportation_tickets.booking_id
+                        WHERE user_id = %s
+                        AND bookings.tickets_booked = %s
+                        AND transportation_tickets.transportation_company = %s
+                        AND transportation_tickets.departure_location = %s
+                        AND transportation_tickets.arrival_location = %s
+                        AND transportation_tickets.departure_time = %s
+                        AND transportation_tickets.departure_date = %s
+                        """,
+                        [user_id,
+                         booking_data["Tickets Booked"],
+                         booking_data["Transportation Company"],
+                         booking_data["Departure Location"],
+                         booking_data["Arrival Location"],
+                         booking_data["Departure Time"],
+                         booking_data["Date"],
+                         ])
+
+                    concert_ticket = cur.fetchone()
+
+                    if not concert_ticket:
+                        print("Concert ticket does not exist, try again!")
+                    else:
+                        booking_id = concert_ticket[0]
+
+                        cur.execute(
+                            """
+                            UPDATE bookings
+                            SET ticket_status = %s
+                            WHERE booking_id = %s
+                            AND user_id = %s
+                            """,
+                            ["Cancelled",
+                             booking_id,
+                             user_id,
+                             ]
+                        )
+
+                        neon_db.commit()
+                elif booking_data["Ticket Type"] == "Concert Ticket":
+                    cur.execute(
+                        """
+                        SELECT *
+                        FROM bookings
+                        JOIN concert_tickets ON bookings.booking_id = concert_tickets.booking_id
+                        WHERE user_id = %s
+                        AND bookings.tickets_booked = %s
+                        AND concert_tickets.event_name = %s
+                        AND concert_tickets.venue = %s
+                        AND concert_tickets.location = %s
+                        AND concert_tickets.event_date = %s 
+                        AND concert_tickets.start_time = %s
+                        """,
+                        [user_id,
+                         booking_data["Tickets Booked"],
+                         booking_data["Event Name"],
+                         booking_data["Venue"],
+                         booking_data["Location"],
+                         booking_data["Date"],
+                         booking_data["Time"],
+                         ])
+
+                    concert_ticket = cur.fetchone()
+
+                    if not concert_ticket:
+                        print("Concert ticket does not exist, try again!")
+                    else:
+                        booking_id = concert_ticket[0]
+
+                        cur.execute(
+                            """
+                            UPDATE bookings
+                            SET ticket_status = %s
+                            WHERE booking_id = %s
+                            AND user_id = %s
+                            """,
+                            ["Cancelled",
+                             booking_id,
+                             user_id,
+                             ]
+                        )
+
+                        neon_db.commit()
+
+                elif booking_data["Ticket Type"] == "Accommodations":
+                    cur.execute(
+                        """
+                        SELECT *
+                        FROM bookings
+                        JOIN accommodations ON bookings.booking_id = accommodations.booking_id
+                        WHERE user_id = %s
+                        AND bookings.tickets_booked = %s
+                        AND accommodations.property_name = %s
+                        AND accommodations.location = %s
+                        AND accommodations.check_in_date = %s
+                        AND accommodations.check_out_date = %s
+                        AND accommodations.check_in_time = %s
+                        """,
+                        [user_id,
+                         booking_data["Tickets Booked"],
+                         booking_data["Property Name"],
+                         booking_data["Location"],
+                         booking_data["Check In Date"],
+                         booking_data["Check Out Date"],
+                         booking_data["Check In Time"],
+                         ])
+
+                    accommodation_ticket = cur.fetchone()
+
+                    if not accommodation_ticket:
+                        print("Accommodation ticket does not exist, try again!")
+                    else:
+                        booking_id = accommodation_ticket[0]
+
+                        cur.execute(
+                            """
+                            UPDATE bookings
+                            SET ticket_status = %s
+                            WHERE booking_id = %s
+                            AND user_id = %s
+                            """,
+                            ["Cancelled",
+                             booking_id,
+                             user_id,
+                             ]
+                        )
+
+                        neon_db.commit()
+                elif booking_data["Ticket Type"] == "Sports Ticket":
+                    cur.execute(
+                        """
+                        SELECT *
+                        FROM bookings
+                        JOIN sports_tickets ON bookings.booking_id = sports_tickets.booking_id
+                        WHERE user_id = %s
+                        AND bookings.tickets_booked = %s
+                        AND sports_tickets.teams = %s
+                        AND sports_tickets.stadium = %s
+                        AND sports_tickets.event_date = %s
+                        AND sports_tickets.start_time = %s
+                        """,
+                        [user_id,
+                         booking_data["Tickets Booked"],
+                         booking_data["Teams"],
+                         booking_data["Stadium"],
+                         booking_data["Date"],
+                         booking_data["Start Time"],
+                         ])
+
+                    sports_ticket = cur.fetchone()
+
+                    if not sports_ticket:
+                        print("Sports ticket does not exist, try again!")
+                    else:
+                        booking_id = sports_ticket[0]
+
+                        cur.execute(
+                            """
+                            UPDATE bookings
+                            SET ticket_status = %s
+                            WHERE booking_id = %s
+                            AND user_id = %s
+                            """,
+                            ["Cancelled",
+                             booking_id,
+                             user_id,
+                             ]
+                        )
+
+                        neon_db.commit()
+
+                print(s)
+                p[0] = s
+
+    except json.JSONDecodeError as e:
+        print(f"JSON Error: {e}")
+    except psycopg.DatabaseError as e:
+        neon_db.rollback()
+        print(f"Database Error: {e}")
+        return None
+    except Exception as e:
+        neon_db.rollback()
+        print(f"Error: {e}")
+        return None
+    finally:
+        cur = neon_db.cursor()
+
+        if cur:
+            cur.close()
 
 
 # List all the available schedules from a hotel/company.
