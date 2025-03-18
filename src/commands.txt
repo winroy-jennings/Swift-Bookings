@@ -29,28 +29,161 @@ List commands:
         List available tickets for event Lion King in London.
         List available tickets for event Cirque du Soleil in Las Vegas.
         List available tickets for event Comedy Show at the Pegasus Hotel.
-        List available tickets for event Ballet performance at the National Theatre.
+        List available tickets for event Ballet performance at the National Theater.
 
 Booking commands:
     Concert tickets:
         Book ticket for concert Tyler Swift at the O2 Arena on February 17, 2025 at 8:30 AM for Jane Doe.
 
+        Book 3 tickets for concert Tyler Swift at the O2 Arena on February 17, 2025 at 8:30 AM for Jane Doe.
+
     Transportation tickets:
         Book ticket for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 6:00 AM for Joy Reynolds.
 
+        Book 5 tickets for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 6:00 AM for Joy Reynolds.
+
     Accommodation tickets:
-        Book accommodation for Spanish Court Hotel in Kingston on February 17, 2025 to February 20, 2025 for Lisa Ann.
+        Book accommodation for Spanish Court Hotel in Kingston on February 17, 2025 to February 20, 2025 at 6:00 AM for Lisa Ann.
+
+        Book 10 accommodations for Spanish Court Hotel in Kingston on February 17, 2025 to February 20, 2025 at 6:00 AM for Lisa Ann.
 
     Sports tickets:
         Book ticket for football match Real Madrid vs Barcelona on February 17, 2025 at 2:30 PM for John Doe.
 
+        Book 23 tickets for football match Real Madrid vs Barcelona on February 17, 2025 at 2:30 PM for John Doe.
+
     General events:
         Book ticket for event Comedy Show at the Pegasus Hotel on February 17, 2025 at 2:30 PM for John Doe.
 
-        Book ticket for event Modern Art Exhibition at the National Gallery on April 15, 2024, at 10:00 AM for Art Lovers Group.
+        Book 6 tickets for event Comedy Show at the Pegasus Hotel on February 17, 2025 at 2:30 PM for John Doe.
+
+        Book ticket for event Modern Art Exhibition at the National Gallery on April 15, 2024 at 10:00 AM for Art Lovers Group.
 
         Book ticket for event Swan Lake Ballet at the Lincoln Center on May 5, 2024 at 8:00 PM for the Thompson Family.
 
+Confirm commands:
+    Concert tickets:
+        Confirm ticket for concert Tyler Swift at the O2 Arena on February 17, 2025 at 8:30 AM for Jane Doe.
 
+        Confirm 3 tickets for concert Tyler Swift at the O2 Arena on February 17, 2025 at 8:30 AM for Jane Doe.
+
+    Transportation tickets:
+        Confirm ticket for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 6:00 AM for Joy Reynolds.
+
+        Confirm 5 tickets for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 6:00 AM for Joy Reynolds.
+
+    Accommodation tickets:
+        Confirm accommodation for Spanish Court Hotel in Kingston on February 17, 2025 to February 20, 2025 at 6:00 AM for Lisa Ann.
+
+        Confirm 10 accommodations for Spanish Court Hotel in Kingston on February 17, 2025 to February 20, 2025 at 6:00 AM for Lisa Ann.
+
+    Sports tickets:
+        Confirm ticket for football match Real Madrid vs Barcelona on February 17, 2025 at 2:30 PM for John Doe.
+
+        Confirm 23 tickets for football match Real Madrid vs Barcelona on February 17, 2025 at 2:30 PM for John Doe.
+
+    General events:
+        Confirm ticket for event Comedy Show at the Pegasus Hotel on February 17, 2025 at 2:30 PM for John Doe.
+
+        Confirm 6 tickets for event Comedy Show at the Pegasus Hotel on February 17, 2025 at 2:30 PM for John Doe.
+
+        Confirm ticket for event Modern Art Exhibition at the National Gallery on April 15, 2024 at 10:00 AM for Art Lovers Group.
+
+        Confirm ticket for event Swan Lake Ballet at the Lincoln Center on May 5, 2024 at 8:00 PM for the Thompson Family.
+
+Pay commands:
+    Concert tickets:
+        Pay ticket for concert Tyler Swift at the O2 Arena on February 17, 2025 at 8:30 AM for Jane Doe.
+
+        Pay 3 tickets for concert Tyler Swift at the O2 Arena on February 17, 2025 at 8:30 AM for Jane Doe.
+
+    Transportation tickets:
+        Pay ticket for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 6:00 AM for Joy Reynolds.
+
+        Pay 5 tickets for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 6:00 AM for Joy Reynolds.
+
+    Accommodation tickets:
+        Pay accommodation for Spanish Court Hotel in Kingston on February 17, 2025 to February 20, 2025 for Lisa Ann.
+
+        Pay 10 accommodations for Spanish Court Hotel in Kingston on February 17, 2025 to February 20, 2025 for Lisa Ann.
+
+    Sports tickets:
+        Pay ticket for football match Real Madrid vs Barcelona on February 17, 2025 at 2:30 PM for John Doe.
+
+        Pay 23 tickets for football match Real Madrid vs Barcelona on February 17, 2025 at 2:30 PM for John Doe.
+
+    General events:
+        Pay ticket for event Comedy Show at the Pegasus Hotel on February 17, 2025 at 2:30 PM for John Doe.
+
+        Pay 6 tickets for event Comedy Show at the Pegasus Hotel on February 17, 2025 at 2:30 PM for John Doe.
+
+        Pay ticket for event Modern Art Exhibition at the National Gallery on April 15, 2024 at 10:00 AM for Art Lovers Group.
+
+        Pay ticket for event Swan Lake Ballet at the Lincoln Center on May 5, 2024 at 8:00 PM for the Thompson Family.
+
+Cancel commands:
+    Concert tickets:
+        Cancel ticket for concert Tyler Swift at the O2 Arena on February 17, 2025 at 8:30 AM for Jane Doe.
+
+        Cancel 3 tickets for concert Tyler Swift at the O2 Arena on February 17, 2025 at 8:30 AM for Jane Doe.
+
+    Transportation tickets:
+        Cancel ticket for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 6:00 AM for Joy Reynolds.
+
+        Cancel 5 tickets for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 6:00 AM for Joy Reynolds.
+
+    Accommodation tickets:
+        Cancel accommodation for Spanish Court Hotel in Kingston on February 17, 2025 to February 20, 2025 for Lisa Ann.
+
+        Cancel 10 accommodations for Spanish Court Hotel in Kingston on February 17, 2025 to February 20, 2025 for Lisa Ann.
+
+    Sports tickets:
+        Cancel ticket for football match Real Madrid vs Barcelona on February 17, 2025 at 2:30 PM for John Doe.
+
+        Cancel 23 tickets for football match Real Madrid vs Barcelona on February 17, 2025 at 2:30 PM for John Doe.
+
+    General events:
+        Cancel ticket for event Comedy Show at the Pegasus Hotel on February 17, 2025 at 2:30 PM for John Doe.
+
+        Cancel 6 tickets for event Comedy Show at the Pegasus Hotel on February 17, 2025 at 2:30 PM for John Doe.
+
+        Cancel ticket for event Modern Art Exhibition at the National Gallery on April 15, 2024 at 10:00 AM for Art Lovers Group.
+
+        Cancel ticket for event Swan Lake Ballet at the Lincoln Center on May 5, 2024 at 8:00 PM for the Thompson Family.
+
+View commands:
+    General events:
+        View general event schedules for Joy Reynolds.
+
+    Transportation tickets:
+        View transportation schedules for Joy Reynolds.
+
+    Accommodation tickets:
+        View accommodation schedules for Joy Reynolds.
+
+    Concert tickets:
+        View concert schedules for Joy Reynolds.
+
+    Sports tickets:
+        View sports schedules for Joy Reynolds.
+
+History commands:
+    General events:
+        View history of general events for Joy Reynolds.
+
+    Transportation tickets:
+        View history of transportation tickets for Joy Reynolds.
+
+    Accommodation tickets:
+        View history of accommodation tickets for Joy Reynolds.
+
+    Concert tickets:
+        View history of concert tickets for Joy Reynolds.
+
+    Sports tickets:
+        View history of sports tickets for Joy Reynolds.
+
+Help commands:
+    View available commands.
 
 
