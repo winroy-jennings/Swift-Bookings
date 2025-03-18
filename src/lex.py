@@ -153,22 +153,6 @@ def t_error(t):
 # Build the lexer
 lexer = lex.lex()
 
-# Map of months to their corresponding numbers
-months = {
-    "January": 1,
-    "February": 2,
-    "March": 3,
-    "April": 4,
-    "May": 5,
-    "June": 6,
-    "July": 7,
-    "August": 8,
-    "September": 9,
-    "October": 10,
-    "November": 11,
-    "December": 12,
-}
-
 
 # --- Parser ---
 
@@ -385,9 +369,9 @@ def p_book_command(p):
 
         # Check for errors
         if query == "Error: Invalid date format":
-            print("DATABASE QUERY")
+            print("Error: Invalid date format")
         elif query == "Error: A name was not entered to whom the tickets should be booked for.":
-            print("Error: Name missing")
+            print("Error: A name was not entered to whom the tickets should be booked for.")
         else:
             print("Processing...")
             # Converts response to JSON object
@@ -700,9 +684,9 @@ def p_confirm_command(p):
 
         # Check for errors
         if query == "Error: Invalid date format":
-            print("DATABASE QUERY")
+            print("Error: Invalid date format")
         elif query == "Error: A name was not entered to whom the tickets should be booked for.":
-            print("Error: Name missing")
+            print("Error: A name was not entered to whom the tickets should be booked for.")
         else:
             print("Processing...")
             # Converts response to JSON object
@@ -1137,9 +1121,9 @@ def p_pay_command(p):
 
         # Check for errors
         if query == "Error: Invalid date format":
-            print("DATABASE QUERY")
+            print("Error: Invalid date format")
         elif query == "Error: A name was not entered to whom the tickets should be booked for.":
-            print("Error: Name missing")
+            print("Error: A name was not entered to whom the tickets should be booked for.")
         else:
             print("Processing...")
             # Converts response to JSON object
@@ -1575,9 +1559,9 @@ def p_cancel_command(p):
 
         # Check for errors
         if query == "Error: Invalid date format":
-            print("DATABASE QUERY")
+            print("Error: Invalid date format")
         elif query == "Error: A name was not entered to whom the tickets should be booked for.":
-            print("Error: Name missing")
+            print("Error: A name was not entered to whom the tickets should be booked for.")
         else:
             print("Processing...")
             # Converts response to JSON object
@@ -2658,7 +2642,7 @@ def p_exit_command(p):
 # Error handling
 def p_error(p):
     print(
-        "Syntax error: Incorrect format."
+        "Syntax error: line {0}: {1}".format(p.lineno, p.value)
     )
 
 
