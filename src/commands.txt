@@ -21,6 +21,8 @@ List commands:
         List available rooms for vacation rental in Ocho Rios.
         List available accommodations in New York City.
 
+        List available rooms for Terra Nova in Kingston.
+
     General Events (Theater, Shows, etc.):
         List available tickets for event Lion King in London.
         List available tickets for event Cirque du Soleil in Las Vegas.
@@ -213,4 +215,3 @@ Complete commands:
 
 Error commands:
     View tickets concert for Jane Doe.
-

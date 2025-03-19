@@ -8,7 +8,6 @@ import os
 
 import psycopg
 from google import genai
-from dotenv import load_dotenv
 
 # Import the tabulate module
 from tabulate import tabulate
@@ -16,14 +15,13 @@ from tabulate import tabulate
 # Set up a logging object
 import logging
 
-# get api keys
-load_dotenv(dotenv_path=".env.local")
-gemini_api_key = os.getenv("GEMINI_API_KEY")
-
-client = genai.Client(api_key=f"{gemini_api_key}")
-
 # Neon db connection
 neon_db: psycopg.connection.Connection
+
+GEMINI_API_KEY = "AIzaSyDEDxnGDL9ltvVdP08eATsY2ax9-nzh6gU"
+DATABASE_URL = 'postgresql://neondb_owner:npg_bHVKEuD2ln7f@ep-spring-math-a8y16efj-pooler.eastus2.azure.neon.tech/neondb?sslmode=require'
+
+client = genai.Client(api_key=f"{GEMINI_API_KEY}")
 
 # Reserved words
 reserved = {
@@ -2666,12 +2664,7 @@ def connect_to_neon_psycopg3():
     global neon_db
 
     try:
-        conn_string = os.getenv("DATABASE_URL")
-
-        if not conn_string:
-            raise ValueError("DATABASE_URL not found in .env file.")
-
-        neon_db = psycopg.connect(conn_string)
+        neon_db = psycopg.connect(DATABASE_URL)
         cur = neon_db.cursor()
 
         cur.execute("""
