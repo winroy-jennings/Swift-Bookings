@@ -1,5 +1,6 @@
 # import libraries
 import json
+import platform
 import sys
 
 import ply.lex as lex
@@ -81,7 +82,8 @@ tokens = [
 # Comments (ignored)
 def t_comment(t):
     r"""\#.*"""
-    pass
+    t.type = "COMMENT"
+    return t
 
 
 # Date values (Month, Day, Year)
@@ -2760,7 +2762,12 @@ def main():
         if not s:
             continue
         elif s.lower() == "clear." or s.lower() == "cls.":
-            os.system("clear")
+            if platform.system() == 'Linux':
+                os.system("clear")
+            elif platform.system() == 'Windows':
+                os.system("cls")
+            elif platform.system() == 'Darwin':  # Mac
+                os.system("clear")
             print("Welcome to APL Booking Project Language (APBL Version 1.0)\n")
             continue
         elif s.lower() == "exit.":
@@ -2795,7 +2802,7 @@ def main():
                 print(tok)
             print("\n")
         else:
-            result = parser.parse(input=s, lexer=lexer, debug=log)
+            parser.parse(input=s, lexer=lexer, debug=log)
 
             print("\n")
 
