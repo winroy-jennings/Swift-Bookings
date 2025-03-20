@@ -2644,9 +2644,10 @@ def p_exit_command(p):
 
 # Error handling
 def p_error(p):
-    print(
-        "Syntax error: line {0}: {1}".format(p.lineno, p.value)
-    )
+    if p is not None:  # Check if p is not None
+        print("Syntax error: line {0}: {1}".format(p.lineno, p.value))
+    else:
+        print("Syntax error: Unexpected end of input.")
 
 
 logging.basicConfig(
