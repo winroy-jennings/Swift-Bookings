@@ -20,7 +20,7 @@ import logging
 neon_db: psycopg.connection.Connection
 
 GEMINI_API_KEY = "AIzaSyDEDxnGDL9ltvVdP08eATsY2ax9-nzh6gU"
-DATABASE_URL = 'postgresql://neondb_owner:npg_bHVKEuD2ln7f@ep-spring-math-a8y16efj-pooler.eastus2.azure.neon.tech/neondb?sslmode=require'
+DATABASE_URL = 'postgresql://neondb_owner:npg_bHVKEuD2ln7f@ep-purple-mud-a8uenqrj-pooler.eastus2.azure.neon.tech/neondb?sslmode=require'
 
 client = genai.Client(api_key=f"{GEMINI_API_KEY}")
 
@@ -182,6 +182,7 @@ def p_identifier_list(p):
                     | IDENTIFIER
                     | STRING
                     | identifier_list '-' identifier_list
+                    | identifier_list INTEGER
     """
 
     # checks if the input length is greater than 3
@@ -262,7 +263,9 @@ def p_book_command(p):
                     Departure Location (City, Country)
                     Arrival Location (City, Country)
                     Departure Time
-                    Date
+                    Departure Date
+                    Arrival Time
+                    Arrival Date
                     Ticket Type
                     Seat Number (Assign any available seat)
                     Tickets Booked
@@ -425,22 +428,24 @@ def p_book_command(p):
 
                 neon_db.commit()
 
-            elif booking_data["Ticket Type"] == "Transportation Ticket":
+            elif booking_data["Ticket Type"] == "Transportation":
                 cur.execute("""
-                    INSERT INTO transportation_tickets (booking_id, transportation_company, departure_location, arrival_location, departure_time, departure_date, seat_number)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s);
+                    INSERT INTO transportation_tickets (booking_id, transportation_company, departure_location, arrival_location, departure_time, departure_date, arrival_time, arrival_date, seat_number)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
                     """, [booking_id,
                           booking_data['Transportation Company'],
                           booking_data['Departure Location'],
                           booking_data['Arrival Location'],
                           booking_data['Departure Time'],
-                          booking_data['Date'],
+                          booking_data['Departure Date'],
+                          booking_data['Arrival Time'],
+                          booking_data['Arrival Date'],
                           booking_data['Seat Number'],
                           ])
 
                 neon_db.commit()
 
-            elif booking_data["Ticket Type"] == "Concert Ticket":
+            elif booking_data["Ticket Type"] == "Concert":
                 cur.execute("""
                     INSERT INTO concert_tickets (booking_id, event_name, venue, location, event_date, start_time, seat_number, price)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
@@ -456,7 +461,7 @@ def p_book_command(p):
 
                 neon_db.commit()
 
-            elif booking_data["Ticket Type"] == "Accommodations":
+            elif booking_data["Ticket Type"] == "Accommodation":
                 cur.execute("""
                     INSERT INTO accommodations (booking_id, property_name, location, room_number, check_in_date, check_out_date, check_in_time, room_type_unit_type, price_per_night, available_rooms_units)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
@@ -474,7 +479,7 @@ def p_book_command(p):
 
                 neon_db.commit()
 
-            elif booking_data["Ticket Type"] == "Sports Ticket":
+            elif booking_data["Ticket Type"] == "Sports":
                 cur.execute("""
                     INSERT INTO sports_tickets (booking_id, teams, stadium, event_date, start_time, seat_location, price, seat_number)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
@@ -1847,15 +1852,16 @@ def p_list_command(p):
             
             Please adhere to the following guidelines:
                 Return just the JSON list of all the available information that is required for the service in question.
-                Remove the ```json ``` form the JSON list. 
+                # Remove the ```json ``` form the JSON list. 
                 No explanation needed.
                 If no schedules or events are found then return an empty JSON list.
                 Capitalize the first letter of each word in the key. Remove underscore if visible then space each word.
                 
                 In the JSON, list the dates in this format: February 17, 2025
+                In the JSON, list the times in this format: 10:00 AM
             
             For Transportation Services (Trains, Buses, Airlines):
-                In the list return only name of provider, route, departure time, arrival time, duration, price and available seats
+                In the list return only name of provider, route, departure date, departure time, arrival date, arrival time, duration, price and available seats
                 
             For Concert Tickets
                 In the list, return only artist/band, venue, date, start time, ticket type, price, and available tickets.
@@ -2636,7 +2642,9 @@ def p_help_command(p):
 
 
 def p_exit_command(p):
-    """exit_command : KEYWORD_EXIT SYM_END"""
+    """
+    exit_command : KEYWORD_EXIT SYM_END
+    """
 
     p[0] = "Exiting the system"
     exit()
@@ -2702,6 +2710,8 @@ def connect_to_neon_psycopg3():
                         arrival_location VARCHAR(255),
                         departure_time TIME,
                         departure_date DATE,
+                        arrival_time TIME,
+                        arrival_date DATE,
                         seat_number VARCHAR(50)
                     );
                     

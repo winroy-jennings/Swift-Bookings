@@ -2,13 +2,13 @@ List commands:
     Transportation (Trains, Buses, Airlines):
         List available schedule for Knutsford Express from Montego Bay to Kingston.
         List available tickets for train from Kingston to Spanish Town.
-        List available schedule for flight from New York to London.
+        List available schedule for flights from New York to London.
         List available tickets for bus from Ocho Rios to Negril.
 
     Concert Tickets:
-        List available tickets for concert Maroon 5 in Kingston.
+        List available tickets for concert Maroon five in Kingston.
         List available tickets for concert Drake at Madison Square Garden.
-        List available tickets for concert Beyoncé at the National Stadium.
+        List available tickets for concert Beyonce at the National Stadium.
         List available tickets for concert Bob Marley tribute at Emancipation Park.
 
     Sports Match Tickets:
