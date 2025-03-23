@@ -6,7 +6,7 @@ List commands:
         List available tickets for bus from Ocho Rios to Negril.
 
     Concert Tickets:
-        List available tickets for concert Maroon five in Kingston.
+        List available tickets for concert Maroon 5 in Kingston.
         List available tickets for concert Drake at Madison Square Garden.
         List available tickets for concert Beyonce at the National Stadium.
         List available tickets for concert Bob Marley tribute at Emancipation Park.
@@ -34,6 +34,8 @@ Booking commands:
         Book ticket for concert Tyler Swift at the O2 Arena on February 17, 2025 at 8:30 AM for Jane Doe.
 
         Book 3 tickets for concert Tyler Swift at the O2 Arena on February 17, 2025 at 8:30 AM for Jane Doe.
+
+        Book 2 tickets for concert Maroon 5 in Kingston on December 31, 2025 at 8:00 PM for John Doe.
 
     Transportation tickets:
         Book ticket for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 6:00 AM for Joy Reynolds.

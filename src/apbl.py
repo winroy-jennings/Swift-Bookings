@@ -195,21 +195,27 @@ def p_identifier_list(p):
 def p_book_command(p):
     """
     book_command : KEYWORD_BOOK TICKET FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_BOOK INTEGER TICKETS FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_BOOK TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_BOOK INTEGER TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_BOOK TICKET FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_BOOK INTEGER TICKETS FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_BOOK TICKET FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_BOOK INTEGER TICKETS FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_BOOK TICKET FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_BOOK INTEGER TICKETS FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_BOOK ACCOMMODATION FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_BOOK INTEGER ACCOMMODATIONS FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
     """
 
@@ -516,21 +522,27 @@ def p_book_command(p):
 def p_confirm_command(p):
     """
     confirm_command : KEYWORD_CONFIRM TICKET FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_CONFIRM INTEGER TICKETS FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CONFIRM TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_CONFIRM INTEGER TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CONFIRM TICKET FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_CONFIRM INTEGER TICKETS FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CONFIRM TICKET FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_CONFIRM INTEGER TICKETS FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CONFIRM TICKET FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_CONFIRM INTEGER TICKETS FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CONFIRM ACCOMMODATION FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_CONFIRM INTEGER ACCOMMODATION FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
     """
 
@@ -953,21 +965,27 @@ def p_confirm_command(p):
 def p_pay_command(p):
     """
     pay_command : KEYWORD_PAY TICKET FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_PAY INTEGER TICKETS FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_PAY TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_PAY INTEGER TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_PAY TICKET FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_PAY INTEGER TICKETS FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_PAY TICKET FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_PAY INTEGER TICKETS FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_PAY TICKET FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_PAY INTEGER TICKETS FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_PAY ACCOMMODATION FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_PAY INTEGER ACCOMMODATIONS FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
     """
 
@@ -1391,21 +1409,27 @@ def p_pay_command(p):
 def p_cancel_command(p):
     """
     cancel_command : KEYWORD_CANCEL TICKET FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_CANCEL INTEGER TICKETS FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CANCEL TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_CANCEL INTEGER TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CANCEL TICKET FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_CANCEL INTEGER TICKETS FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CANCEL TICKET FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_CANCEL INTEGER TICKETS FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CANCEL TICKET FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_CANCEL INTEGER TICKETS FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CANCEL ACCOMMODATION FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
+                
                 | KEYWORD_CANCEL INTEGER ACCOMMODATIONS FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
     """
 
@@ -1829,19 +1853,25 @@ def p_cancel_command(p):
 def p_list_command(p):
     """
     list_command : KEYWORD_LIST AVAILABLE SCHEDULE FOR identifier_list SYM_END
+                
                 | KEYWORD_LIST AVAILABLE SCHEDULE FOR identifier_list FROM identifier_list TO identifier_list SYM_END
+                
                 | KEYWORD_LIST AVAILABLE TICKETS FOR identifier_list FROM identifier_list TO identifier_list SYM_END
 
                 | KEYWORD_LIST AVAILABLE TICKETS FOR CONCERT identifier_list IN identifier_list SYM_END
+
                 | KEYWORD_LIST AVAILABLE TICKETS FOR CONCERT identifier_list AT identifier_list SYM_END
 
                 | KEYWORD_LIST AVAILABLE TICKETS FOR identifier_list SYM_END
+                
                 | KEYWORD_LIST AVAILABLE TICKETS FOR identifier_list AT identifier_list SYM_END
 
                 | KEYWORD_LIST AVAILABLE ACCOMMODATIONS IN identifier_list SYM_END
+                
                 | KEYWORD_LIST AVAILABLE ROOMS FOR identifier_list IN identifier_list SYM_END
 
                 | KEYWORD_LIST AVAILABLE TICKETS FOR EVENT identifier_list IN identifier_list SYM_END
+                
                 | KEYWORD_LIST AVAILABLE TICKETS FOR EVENT identifier_list AT identifier_list SYM_END
     """
 
@@ -1859,12 +1889,17 @@ def p_list_command(p):
                 
                 In the JSON, list the dates in this format: February 17, 2025
                 In the JSON, list the times in this format: 10:00 AM
+
+                IMPORTANT:
+                    Get all the available schedules FROM today's date and beyond. NOT AFTER today's date.
+                    DO NOT FETCH SCHEDULES FOR PAST DATES.
+                    Example: if today is March 21, 2025, Do not get ticket information for March 05, 2024
             
             For Transportation Services (Trains, Buses, Airlines):
                 In the list return only name of provider, route, departure date, departure time, arrival date, arrival time, duration, price and available seats
                 
             For Concert Tickets
-                In the list, return only artist/band, venue, date, start time, ticket type, price, and available tickets.
+                In the list, return only artist/band, venue, location (city, country), date, start time, ticket type, price, and available tickets.
             
             For Football Match Tickets:
                 In the list, return only teams, stadium, date, start time, seat location, price, and available tickets.
@@ -2668,7 +2703,7 @@ logging.basicConfig(
 log = logging.getLogger()
 
 # Build the parser
-parser = yacc.yacc(optimize=1, debug=1, debuglog=log)
+parser = yacc.yacc(optimize=0, debug=1, debuglog=log)
 
 
 def connect_to_neon_psycopg3():
