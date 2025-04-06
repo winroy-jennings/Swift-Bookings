@@ -1896,19 +1896,56 @@ def p_list_command(p):
                     Example: if today is March 21, 2025, Do not get ticket information for March 05, 2024
             
             For Transportation Services (Trains, Buses, Airlines):
-                In the list return only name of provider, route, departure date, departure time, arrival date, arrival time, duration, price and available seats
+                provider
+                route
+                departure date (Date format, i.e: 2025-02-17)
+                departure time (24-hour format, i.e: 06:00:00)
+                arrival date (Date format, i.e: 2025-02-17)
+                arrival time (24-hour format, i.e: 06:00:00)
+                duration
+                ticket type ("Transportation Ticket")
+                price (i.e: "$150.00")
+                available seats
                 
             For Concert Tickets
-                In the list, return only artist/band, venue, location (city, country), date, start time, ticket type, price, and available tickets.
+              artist/band (Write the key as "Artist/Band" in the JSON list)
+              venue
+              location (City, Country, i.e: Kingston, Jamaica)
+              date (Date format, i.e: 2025-02-17)
+              start time (24-hour format, i.e: 06:00:00)
+              ticket type ("Concert Ticket")
+              price (i.e: "$150.00")
+              available tickets
             
-            For Football Match Tickets:
-                In the list, return only teams, stadium, date, start time, seat location, price, and available tickets.
+            For Sports Tickets:
+                teams
+                stadium (Stadium, City, Country) 
+                date (Date format, i.e: 2025-02-17)
+                start time (24-hour format, i.e: 06:00:00)
+                seat location
+                ticket type ("Sports Ticket")
+                price (i.e: "$150.00")
+                available tickets
             
             For Accommodation (Hotels, Rentals):
-                In the list, return only property name, location, room number, check-in date, check-out date, room type/unit type, price per night, and available rooms/units.
+                property name
+                location (City, Country, i.e: Kingston, Jamaica)
+                room number
+                check-in date (Date format, i.e: 2025-02-17)
+                check-out date (Date format, i.e: 2025-02-17)
+                room type/unit type
+                ticket type ("Accommodation Ticket")
+                price per night (i.e: "$150.00")
+                available rooms/units
             
             For General Events (Theater, Shows, etc.):
-                In the list, return only event name, venue, date, start time, ticket type, price, and available tickets.
+                event name
+                venue (Venue, City, Country)
+                date (Date format, i.e: 2025-02-17)
+                start time (24-hour format, i.e: 06:00:00)
+                ticket type ("General Ticket")
+                price (i.e: "$150.00")
+                available tickets
             
             For the price, also state the currency. i.e: $350 (JMD) or $350 (USD) 
         """
@@ -1928,14 +1965,107 @@ def p_list_command(p):
         if len(result) == 0:
             print(f"No schedules found for {p[5]}.")
         else:
-            for item in result:
-                keys = list(item.keys())
+            if result[0]['Ticket Type'] == 'General Ticket':
+                data_list = []
+                data = []
 
-                for key, value in item.items():
-                    print(f'{key}: {value}', end=",\n" if key != keys[-1] else "\n")
+                for i in result:
+                    # print(i)
+                    data = [i['Event Name'], i['Venue'], i['Date'], i['Start Time'], i['Price'], i['Available Tickets']]
 
-                if item != result[-1]:
-                    print("\n")
+                    data_list.append(data)
+
+                # Creating a table with headers and a grid format
+                table = tabulate(
+                    data_list,
+                    headers=['Event Name', 'Venue', 'Date', 'Start Time', 'Price', 'Available Tickets'],
+                    tablefmt="grid"
+                )
+
+                print(table)
+
+            elif result[0]['Ticket Type'] == 'Concert Ticket':
+                data_list = []
+                data = []
+
+                for i in result:
+                    # print(i)
+                    data = [i['Artist/Band'], i['Venue'], i['Location'], i['Date'], i['Start Time'], i['Price'],
+                            i['Available Tickets']]
+
+                    data_list.append(data)
+
+                # Creating a table with headers and a grid format
+                table = tabulate(
+                    data_list,
+                    headers=['Artist/Band', 'Venue', 'Location', 'Date', 'Start Time', 'Price', 'Available Tickets'],
+                    tablefmt="grid"
+                )
+
+                print(table)
+
+            elif result[0]['Ticket Type'] == 'Sports Ticket':
+                data_list = []
+                data = []
+
+                for i in result:
+                    # print(i)
+                    data = [i['Teams'], i['Stadium'], i['Date'], i['Start Time'], i['Seat Location'], i['Price'],
+                            i['Available Tickets']]
+
+                    data_list.append(data)
+
+                # Creating a table with headers and a grid format
+                table = tabulate(
+                    data_list,
+                    headers=['Teams', 'Stadium', 'Date', 'Start Time', 'Seat Location', 'Price', 'Available Tickets'],
+                    tablefmt="grid"
+                )
+
+                print(table)
+
+            elif result[0]['Ticket Type'] == 'Accommodation Ticket':
+                data_list = []
+                data = []
+
+                for i in result:
+                    # print(i)
+                    data = [i['Property Name'], i['Location'], i['Room Number'], i['Check-In Date'],
+                            i['Check-Out Date'],
+                            i['Room Type/Unit Type'], i['Price Per Night'], i['Available Rooms/Units']]
+
+                    data_list.append(data)
+
+                # Creating a table with headers and a grid format
+                table = tabulate(
+                    data_list,
+                    headers=['Property Name', 'Location', 'Room Number', 'Check-In Date', 'Check-Out Date',
+                             'Room Type/Unit Type', 'Price Per Night', 'Available Rooms/Units'],
+                    tablefmt="grid"
+                )
+
+                print(table)
+
+            elif result[0]['Ticket Type'] == 'Transportation Ticket':
+                data_list = []
+                data = []
+
+                for i in result:
+                    # print(i)
+                    data = [i['Provider'], i['Route'], i['Departure Date'], i['Departure Time'], i['Arrival Date'],
+                            i['Arrival Time'], i['Duration'], i['Price'], i['Available Seats']]
+
+                    data_list.append(data)
+
+                # Creating a table with headers and a grid format
+                table = tabulate(
+                    data_list,
+                    headers=['Provider', 'Route', 'Departure Date', 'Departure Time', 'Arrival Date', 'Arrival Time',
+                             'Duration', 'Price', 'Available Seats'],
+                    tablefmt="grid"
+                )
+
+                print(table)
 
         p[0] = s
     except json.JSONDecodeError as e:

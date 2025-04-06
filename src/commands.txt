@@ -3,6 +3,7 @@ List commands:
         List available schedule for Knutsford Express from Montego Bay to Kingston.
         List available tickets for train from Kingston to Spanish Town.
         List available schedule for flights from New York to London.
+        List available schedule for Knutsford Express from Montego Bay to Kingston.
         List available tickets for bus from Ocho Rios to Negril.
 
     Concert Tickets:
@@ -39,6 +40,8 @@ Booking commands:
 
     Transportation tickets:
         Book ticket for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 6:00 AM for Joy Reynolds.
+
+        Book ticket for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 6:00 AM for Jane Doe.
 
         Book 5 tickets for Knutsford Express from Montego Bay to Kingston on February 17, 2025 at 6:00 AM for Joy Reynolds.
 
