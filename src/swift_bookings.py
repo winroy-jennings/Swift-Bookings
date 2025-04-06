@@ -2910,11 +2910,11 @@ def connect_to_neon_psycopg3():
 def main():
     lexical_mode = False
 
-    print("Welcome to APL Booking Project Language (APBL Version 1.0)\n")
+    print("Welcome to Swift Bookings (SB Version 1.0)\n")
 
     while True:
         try:
-            s = input("APBL> ")
+            s = input("Prompt> ")
         except EOFError:
             break
         except KeyboardInterrupt:
@@ -2922,14 +2922,14 @@ def main():
             break
         if not s:
             continue
-        elif s.lower() == "clear." or s.lower() == "cls.":
+        elif s.lower() == "clear" or s.lower() == "cls":
             if platform.system() == 'Linux':
                 os.system("clear")
             elif platform.system() == 'Windows':
                 os.system("cls")
             elif platform.system() == 'Darwin':  # Mac
                 os.system("clear")
-            print("Welcome to APL Booking Project Language (APBL Version 1.0)\n")
+            print("Welcome to Swift Bookings (SB Version 1.0)\n")
             continue
         elif s.lower() == "exit.":
             print("Exiting the system...")
