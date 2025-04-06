@@ -1967,7 +1967,6 @@ def p_list_command(p):
         else:
             if result[0]['Ticket Type'] == 'General Ticket':
                 data_list = []
-                data = []
 
                 for i in result:
                     # print(i)
@@ -1986,7 +1985,6 @@ def p_list_command(p):
 
             elif result[0]['Ticket Type'] == 'Concert Ticket':
                 data_list = []
-                data = []
 
                 for i in result:
                     # print(i)
@@ -2006,7 +2004,6 @@ def p_list_command(p):
 
             elif result[0]['Ticket Type'] == 'Sports Ticket':
                 data_list = []
-                data = []
 
                 for i in result:
                     # print(i)
@@ -2026,7 +2023,6 @@ def p_list_command(p):
 
             elif result[0]['Ticket Type'] == 'Accommodation Ticket':
                 data_list = []
-                data = []
 
                 for i in result:
                     # print(i)
@@ -2048,7 +2044,6 @@ def p_list_command(p):
 
             elif result[0]['Ticket Type'] == 'Transportation Ticket':
                 data_list = []
-                data = []
 
                 for i in result:
                     # print(i)
@@ -2160,7 +2155,6 @@ def p_view_command(p):
                     print("General tickets does not exist, try again!")
                 else:
                     data_list = []
-                    data = []
 
                     for i in general_tickets:
                         # print(i)
@@ -2203,7 +2197,6 @@ def p_view_command(p):
                     print("Transportation tickets does not exist, try again!")
                 else:
                     data_list = []
-                    data = []
 
                     for i in transportation_tickets:
                         # print(i)
@@ -2248,7 +2241,6 @@ def p_view_command(p):
                     print("Accommodation tickets does not exist, try again!")
                 else:
                     data_list = []
-                    data = []
 
                     for i in accommodation_tickets:
                         # print(i)
@@ -2293,7 +2285,6 @@ def p_view_command(p):
                     print("Concert tickets does not exist, try again!")
                 else:
                     data_list = []
-                    data = []
 
                     for i in concert_tickets:
                         # print(i)
@@ -2337,7 +2328,6 @@ def p_view_command(p):
                     print("Sports tickets does not exist, try again!")
                 else:
                     data_list = []
-                    data = []
 
                     for i in concert_tickets:
                         # print(i)
@@ -2450,7 +2440,6 @@ def p_history_command(p):
                 print("\tGeneral tickets does not exist.\n")
             else:
                 data_list = []
-                data = []
 
                 for i in general_tickets:
                     # print(i)
@@ -2495,7 +2484,6 @@ def p_history_command(p):
                 print("\tTransportation tickets does not exist.\n")
             else:
                 data_list = []
-                data = []
 
                 for i in transportation_tickets:
                     # print(i)
@@ -2542,7 +2530,6 @@ def p_history_command(p):
                 print("\tAccommodation tickets does not exist.\n")
             else:
                 data_list = []
-                data = []
 
                 for i in accommodation_tickets:
                     # print(i)
@@ -2589,7 +2576,6 @@ def p_history_command(p):
                 print("\tConcert tickets does not exist.\n")
             else:
                 data_list = []
-                data = []
 
                 for i in concert_tickets:
                     # print(i)
@@ -2635,7 +2621,6 @@ def p_history_command(p):
                 print("\tSports tickets does not exist.\n")
             else:
                 data_list = []
-                data = []
 
                 for i in concert_tickets:
                     # print(i)
@@ -2833,7 +2818,7 @@ logging.basicConfig(
 log = logging.getLogger()
 
 # Build the parser
-parser = yacc.yacc(optimize=0, debug=1, debuglog=log)
+parser = yacc.yacc(optimize=1, debug=1, debuglog=log)
 
 
 def connect_to_neon_psycopg3():
