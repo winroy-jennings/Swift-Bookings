@@ -19,8 +19,14 @@ import logging
 # Neon db connection
 neon_db: psycopg.connection.Connection
 
-GEMINI_API_KEY = "AIzaSyDEDxnGDL9ltvVdP08eATsY2ax9-nzh6gU"
-DATABASE_URL = 'postgresql://neondb_owner:npg_bHVKEuD2ln7f@ep-purple-mud-a8uenqrj-pooler.eastus2.azure.neon.tech/neondb?sslmode=require'
+# Load secrets from .env file
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Set Gemini API key
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 client = genai.Client(api_key=f"{GEMINI_API_KEY}")
 
@@ -36,10 +42,8 @@ reserved = {
     "History": "KEYWORD_HISTORY",
     "Help": "KEYWORD_HELP",
     "Exit": "KEYWORD_EXIT",
-
     # Reserved words
     "available": "AVAILABLE",
-
     # Keyword identifiers
     "ticket": "TICKET",
     "tickets": "TICKETS",
@@ -48,14 +52,12 @@ reserved = {
     "accommodations": "ACCOMMODATIONS",
     "rooms": "ROOMS",
     "event": "EVENT",
-
     # Others
     "schedule": "SCHEDULE",
     # Others
     "general": "GENERAL",
     "transportation": "TRANSPORTATION",
     "sports": "SPORTS",
-
     # Details
     "from": "FROM",
     "to": "TO",
@@ -159,6 +161,7 @@ lexer = lex.lex()
 
 # --- Parser ---
 
+
 # Grammar rules
 def p_command(p):
     """
@@ -195,27 +198,27 @@ def p_identifier_list(p):
 def p_book_command(p):
     """
     book_command : KEYWORD_BOOK TICKET FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_BOOK INTEGER TICKETS FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_BOOK TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_BOOK INTEGER TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_BOOK TICKET FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_BOOK INTEGER TICKETS FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_BOOK TICKET FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_BOOK INTEGER TICKETS FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_BOOK TICKET FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_BOOK INTEGER TICKETS FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_BOOK ACCOMMODATION FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_BOOK INTEGER ACCOMMODATIONS FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
     """
 
@@ -374,7 +377,9 @@ def p_book_command(p):
         )
 
         # Cleanup response returned from gemini
-        query = response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        query = (
+            response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        )
 
         # Return a new `Cursor` to send commands and queries to the connection
         cur = neon_db.cursor()
@@ -382,122 +387,158 @@ def p_book_command(p):
         # Check for errors
         if query == "Error: Invalid date format":
             print("Error: Invalid date format")
-        elif query == "Error: A name was not entered to whom the tickets should be booked for.":
-            print("Error: A name was not entered to whom the tickets should be booked for.")
+        elif (
+                query
+                == "Error: A name was not entered to whom the tickets should be booked for."
+        ):
+            print(
+                "Error: A name was not entered to whom the tickets should be booked for."
+            )
         else:
             print("Processing...")
             # Converts response to JSON object
             booking_data: json = json.loads(query)
 
-            cur.execute("SELECT user_id FROM users WHERE customer_name = %s", [booking_data['Customer Name']])
+            cur.execute(
+                "SELECT user_id FROM users WHERE customer_name = %s",
+                [booking_data["Customer Name"]],
+            )
             # Gets the first element
             existing_user = cur.fetchone()
 
             if existing_user:
                 user_id = existing_user[0]
             else:
-                cur.execute("""
+                cur.execute(
+                    """
                            INSERT INTO users (customer_name)
                            VALUES (%s)
                            RETURNING user_id;
-                       """, [booking_data['Customer Name']])
+                       """,
+                    [booking_data["Customer Name"]],
+                )
 
                 neon_db.commit()
                 user_id = cur.fetchone()[0]
 
             # Insert into booking table
-            cur.execute("""
+            cur.execute(
+                """
                        INSERT INTO bookings (user_id, ticket_type, ticket_status, tickets_booked)
                        VALUES (%s, %s, %s, %s)
                        RETURNING booking_id;
-                   """, (user_id,
-                         booking_data['Ticket Type'],
-                         'Booked',
-                         booking_data['Tickets Booked']))
+                   """,
+                (
+                    user_id,
+                    booking_data["Ticket Type"],
+                    "Booked",
+                    booking_data["Tickets Booked"],
+                ),
+            )
 
             # Gets the first element
             booking_id = cur.fetchone()[0]
 
             # Checks a ticket type then runs the appropriate queries
             if booking_data["Ticket Type"] == "General Event":
-                cur.execute("""
+                cur.execute(
+                    """
                     INSERT INTO general_events (booking_id, event_name, venue, event_date, start_time, price, available_tickets)
                     VALUES (%s, %s, %s, %s, %s, %s, %s);
-                    """, [booking_id,
-                          booking_data['Event Name'],
-                          booking_data['Venue'],
-                          booking_data['Date'],
-                          booking_data['Time'],
-                          booking_data['Price'],
-                          booking_data['Available Tickets'],
-                          ])
+                    """,
+                    [
+                        booking_id,
+                        booking_data["Event Name"],
+                        booking_data["Venue"],
+                        booking_data["Date"],
+                        booking_data["Time"],
+                        booking_data["Price"],
+                        booking_data["Available Tickets"],
+                    ],
+                )
 
                 neon_db.commit()
 
             elif booking_data["Ticket Type"] == "Transportation":
-                cur.execute("""
+                cur.execute(
+                    """
                     INSERT INTO transportation_tickets (booking_id, transportation_company, departure_location, arrival_location, departure_time, departure_date, arrival_time, arrival_date, seat_number)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
-                    """, [booking_id,
-                          booking_data['Transportation Company'],
-                          booking_data['Departure Location'],
-                          booking_data['Arrival Location'],
-                          booking_data['Departure Time'],
-                          booking_data['Departure Date'],
-                          booking_data['Arrival Time'],
-                          booking_data['Arrival Date'],
-                          booking_data['Seat Number'],
-                          ])
+                    """,
+                    [
+                        booking_id,
+                        booking_data["Transportation Company"],
+                        booking_data["Departure Location"],
+                        booking_data["Arrival Location"],
+                        booking_data["Departure Time"],
+                        booking_data["Departure Date"],
+                        booking_data["Arrival Time"],
+                        booking_data["Arrival Date"],
+                        booking_data["Seat Number"],
+                    ],
+                )
 
                 neon_db.commit()
 
             elif booking_data["Ticket Type"] == "Concert":
-                cur.execute("""
+                cur.execute(
+                    """
                     INSERT INTO concert_tickets (booking_id, event_name, venue, location, event_date, start_time, seat_number, price)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
-                    """, [booking_id,
-                          booking_data['Event Name'],
-                          booking_data['Venue'],
-                          booking_data['Location'],
-                          booking_data['Date'],
-                          booking_data['Time'],
-                          booking_data['Seat Number'],
-                          booking_data['Price'],
-                          ])
+                    """,
+                    [
+                        booking_id,
+                        booking_data["Event Name"],
+                        booking_data["Venue"],
+                        booking_data["Location"],
+                        booking_data["Date"],
+                        booking_data["Time"],
+                        booking_data["Seat Number"],
+                        booking_data["Price"],
+                    ],
+                )
 
                 neon_db.commit()
 
             elif booking_data["Ticket Type"] == "Accommodation":
-                cur.execute("""
+                cur.execute(
+                    """
                     INSERT INTO accommodations (booking_id, property_name, location, room_number, check_in_date, check_out_date, check_in_time, room_type_unit_type, price_per_night, available_rooms_units)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-                    """, [booking_id,
-                          booking_data['Property Name'],
-                          booking_data['Location'],
-                          booking_data['Room Number'],
-                          booking_data['Check In Date'],
-                          booking_data['Check Out Date'],
-                          booking_data['Check In Time'],
-                          booking_data['Room Type Unit Type'],
-                          booking_data['Price Per Night'],
-                          booking_data['Available Rooms Units'],
-                          ])
+                    """,
+                    [
+                        booking_id,
+                        booking_data["Property Name"],
+                        booking_data["Location"],
+                        booking_data["Room Number"],
+                        booking_data["Check In Date"],
+                        booking_data["Check Out Date"],
+                        booking_data["Check In Time"],
+                        booking_data["Room Type Unit Type"],
+                        booking_data["Price Per Night"],
+                        booking_data["Available Rooms Units"],
+                    ],
+                )
 
                 neon_db.commit()
 
             elif booking_data["Ticket Type"] == "Sports":
-                cur.execute("""
+                cur.execute(
+                    """
                     INSERT INTO sports_tickets (booking_id, teams, stadium, event_date, start_time, seat_location, price, seat_number)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
-                    """, [booking_id,
-                          booking_data['Teams'],
-                          booking_data['Stadium'],
-                          booking_data['Date'],
-                          booking_data['Start Time'],
-                          booking_data['Seat Location'],
-                          booking_data['Price'],
-                          booking_data['Seat Number'],
-                          ])
+                    """,
+                    [
+                        booking_id,
+                        booking_data["Teams"],
+                        booking_data["Stadium"],
+                        booking_data["Date"],
+                        booking_data["Start Time"],
+                        booking_data["Seat Location"],
+                        booking_data["Price"],
+                        booking_data["Seat Number"],
+                    ],
+                )
 
                 neon_db.commit()
 
@@ -522,27 +563,27 @@ def p_book_command(p):
 def p_confirm_command(p):
     """
     confirm_command : KEYWORD_CONFIRM TICKET FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_CONFIRM INTEGER TICKETS FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CONFIRM TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_CONFIRM INTEGER TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CONFIRM TICKET FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_CONFIRM INTEGER TICKETS FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CONFIRM TICKET FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_CONFIRM INTEGER TICKETS FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CONFIRM TICKET FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_CONFIRM INTEGER TICKETS FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CONFIRM ACCOMMODATION FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_CONFIRM INTEGER ACCOMMODATION FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
     """
 
@@ -699,20 +740,30 @@ def p_confirm_command(p):
         )
 
         # Cleanup response returned from gemini
-        query = response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        query = (
+            response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        )
         # print(query)
 
         # Check for errors
         if query == "Error: Invalid date format":
             print("Error: Invalid date format")
-        elif query == "Error: A name was not entered to whom the tickets should be booked for.":
-            print("Error: A name was not entered to whom the tickets should be booked for.")
+        elif (
+                query
+                == "Error: A name was not entered to whom the tickets should be booked for."
+        ):
+            print(
+                "Error: A name was not entered to whom the tickets should be booked for."
+            )
         else:
             print("Processing...")
             # Converts response to JSON object
             booking_data: json = json.loads(query)
 
-            cur.execute("SELECT user_id FROM users WHERE customer_name = %s", (booking_data['Customer Name'],))
+            cur.execute(
+                "SELECT user_id FROM users WHERE customer_name = %s",
+                (booking_data["Customer Name"],),
+            )
             # Gets the first element
             existing_user = cur.fetchone()
 
@@ -737,13 +788,15 @@ def p_confirm_command(p):
                         AND general_events.event_date = %s
                         AND general_events.start_time = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Event Name"],
-                         booking_data["Venue"],
-                         booking_data["Date"],
-                         booking_data["Time"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Event Name"],
+                            booking_data["Venue"],
+                            booking_data["Date"],
+                            booking_data["Time"],
+                        ],
+                    )
 
                     concert_ticket = cur.fetchone()
 
@@ -759,10 +812,11 @@ def p_confirm_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Confirmed",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Confirmed",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -780,14 +834,16 @@ def p_confirm_command(p):
                         AND transportation_tickets.departure_time = %s
                         AND transportation_tickets.departure_date = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Transportation Company"],
-                         booking_data["Departure Location"],
-                         booking_data["Arrival Location"],
-                         booking_data["Departure Time"],
-                         booking_data["Date"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Transportation Company"],
+                            booking_data["Departure Location"],
+                            booking_data["Arrival Location"],
+                            booking_data["Departure Time"],
+                            booking_data["Date"],
+                        ],
+                    )
 
                     concert_ticket = cur.fetchone()
 
@@ -803,10 +859,11 @@ def p_confirm_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Confirmed",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Confirmed",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -824,14 +881,16 @@ def p_confirm_command(p):
                         AND concert_tickets.event_date = %s 
                         AND concert_tickets.start_time = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Event Name"],
-                         booking_data["Venue"],
-                         booking_data["Location"],
-                         booking_data["Date"],
-                         booking_data["Time"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Event Name"],
+                            booking_data["Venue"],
+                            booking_data["Location"],
+                            booking_data["Date"],
+                            booking_data["Time"],
+                        ],
+                    )
 
                     concert_ticket = cur.fetchone()
 
@@ -847,10 +906,11 @@ def p_confirm_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Confirmed",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Confirmed",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -869,14 +929,16 @@ def p_confirm_command(p):
                         AND accommodations.check_out_date = %s
                         AND accommodations.check_in_time = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Property Name"],
-                         booking_data["Location"],
-                         booking_data["Check In Date"],
-                         booking_data["Check Out Date"],
-                         booking_data["Check In Time"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Property Name"],
+                            booking_data["Location"],
+                            booking_data["Check In Date"],
+                            booking_data["Check Out Date"],
+                            booking_data["Check In Time"],
+                        ],
+                    )
 
                     accommodation_ticket = cur.fetchone()
 
@@ -892,10 +954,11 @@ def p_confirm_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Confirmed",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Confirmed",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -912,13 +975,15 @@ def p_confirm_command(p):
                         AND sports_tickets.event_date = %s
                         AND sports_tickets.start_time = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Teams"],
-                         booking_data["Stadium"],
-                         booking_data["Date"],
-                         booking_data["Start Time"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Teams"],
+                            booking_data["Stadium"],
+                            booking_data["Date"],
+                            booking_data["Start Time"],
+                        ],
+                    )
 
                     sports_ticket = cur.fetchone()
 
@@ -934,10 +999,11 @@ def p_confirm_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Confirmed",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Confirmed",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -965,27 +1031,27 @@ def p_confirm_command(p):
 def p_pay_command(p):
     """
     pay_command : KEYWORD_PAY TICKET FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_PAY INTEGER TICKETS FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_PAY TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_PAY INTEGER TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_PAY TICKET FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_PAY INTEGER TICKETS FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_PAY TICKET FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_PAY INTEGER TICKETS FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_PAY TICKET FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_PAY INTEGER TICKETS FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_PAY ACCOMMODATION FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_PAY INTEGER ACCOMMODATIONS FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
     """
 
@@ -1142,20 +1208,30 @@ def p_pay_command(p):
         )
 
         # Cleanup response returned from gemini
-        query = response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        query = (
+            response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        )
         # print(query)
 
         # Check for errors
         if query == "Error: Invalid date format":
             print("Error: Invalid date format")
-        elif query == "Error: A name was not entered to whom the tickets should be booked for.":
-            print("Error: A name was not entered to whom the tickets should be booked for.")
+        elif (
+                query
+                == "Error: A name was not entered to whom the tickets should be booked for."
+        ):
+            print(
+                "Error: A name was not entered to whom the tickets should be booked for."
+            )
         else:
             print("Processing...")
             # Converts response to JSON object
             booking_data: json = json.loads(query)
 
-            cur.execute("SELECT user_id FROM users WHERE customer_name = %s", (booking_data['Customer Name'],))
+            cur.execute(
+                "SELECT user_id FROM users WHERE customer_name = %s",
+                (booking_data["Customer Name"],),
+            )
             # Gets the first element
             existing_user = cur.fetchone()
 
@@ -1180,13 +1256,15 @@ def p_pay_command(p):
                         AND general_events.event_date = %s
                         AND general_events.start_time = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Event Name"],
-                         booking_data["Venue"],
-                         booking_data["Date"],
-                         booking_data["Time"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Event Name"],
+                            booking_data["Venue"],
+                            booking_data["Date"],
+                            booking_data["Time"],
+                        ],
+                    )
 
                     concert_ticket = cur.fetchone()
 
@@ -1202,10 +1280,11 @@ def p_pay_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Paid",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Paid",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -1223,14 +1302,16 @@ def p_pay_command(p):
                         AND transportation_tickets.departure_time = %s
                         AND transportation_tickets.departure_date = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Transportation Company"],
-                         booking_data["Departure Location"],
-                         booking_data["Arrival Location"],
-                         booking_data["Departure Time"],
-                         booking_data["Date"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Transportation Company"],
+                            booking_data["Departure Location"],
+                            booking_data["Arrival Location"],
+                            booking_data["Departure Time"],
+                            booking_data["Date"],
+                        ],
+                    )
 
                     transportation_ticket = cur.fetchone()
 
@@ -1246,10 +1327,11 @@ def p_pay_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Paid",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Paid",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -1267,14 +1349,16 @@ def p_pay_command(p):
                         AND concert_tickets.event_date = %s 
                         AND concert_tickets.start_time = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Event Name"],
-                         booking_data["Venue"],
-                         booking_data["Location"],
-                         booking_data["Date"],
-                         booking_data["Time"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Event Name"],
+                            booking_data["Venue"],
+                            booking_data["Location"],
+                            booking_data["Date"],
+                            booking_data["Time"],
+                        ],
+                    )
 
                     concert_ticket = cur.fetchone()
 
@@ -1290,10 +1374,11 @@ def p_pay_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Paid",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Paid",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -1312,14 +1397,16 @@ def p_pay_command(p):
                         AND accommodations.check_out_date = %s
                         AND accommodations.check_in_time = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Property Name"],
-                         booking_data["Location"],
-                         booking_data["Check In Date"],
-                         booking_data["Check Out Date"],
-                         booking_data["Check In Time"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Property Name"],
+                            booking_data["Location"],
+                            booking_data["Check In Date"],
+                            booking_data["Check Out Date"],
+                            booking_data["Check In Time"],
+                        ],
+                    )
 
                     accommodation_ticket = cur.fetchone()
 
@@ -1335,10 +1422,11 @@ def p_pay_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Paid",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Paid",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -1355,13 +1443,15 @@ def p_pay_command(p):
                         AND sports_tickets.event_date = %s
                         AND sports_tickets.start_time = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Teams"],
-                         booking_data["Stadium"],
-                         booking_data["Date"],
-                         booking_data["Start Time"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Teams"],
+                            booking_data["Stadium"],
+                            booking_data["Date"],
+                            booking_data["Start Time"],
+                        ],
+                    )
 
                     sports_ticket = cur.fetchone()
 
@@ -1377,10 +1467,11 @@ def p_pay_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Paid",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Paid",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -1409,27 +1500,27 @@ def p_pay_command(p):
 def p_cancel_command(p):
     """
     cancel_command : KEYWORD_CANCEL TICKET FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_CANCEL INTEGER TICKETS FOR identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CANCEL TICKET FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_CANCEL INTEGER TICKETS FOR identifier_list FROM identifier_list TO identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CANCEL TICKET FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_CANCEL INTEGER TICKETS FOR CONCERT identifier_list IN identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CANCEL TICKET FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_CANCEL INTEGER TICKETS FOR CONCERT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CANCEL TICKET FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_CANCEL INTEGER TICKETS FOR EVENT identifier_list AT identifier_list ON DATE AT TIME FOR identifier_list SYM_END
 
                 | KEYWORD_CANCEL ACCOMMODATION FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
-                
+
                 | KEYWORD_CANCEL INTEGER ACCOMMODATIONS FOR identifier_list IN identifier_list ON DATE TO DATE AT TIME FOR identifier_list SYM_END
     """
 
@@ -1586,20 +1677,30 @@ def p_cancel_command(p):
         )
 
         # Cleanup response returned from gemini
-        query = response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        query = (
+            response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        )
         # print(query)
 
         # Check for errors
         if query == "Error: Invalid date format":
             print("Error: Invalid date format")
-        elif query == "Error: A name was not entered to whom the tickets should be booked for.":
-            print("Error: A name was not entered to whom the tickets should be booked for.")
+        elif (
+                query
+                == "Error: A name was not entered to whom the tickets should be booked for."
+        ):
+            print(
+                "Error: A name was not entered to whom the tickets should be booked for."
+            )
         else:
             print("Processing...")
             # Converts response to JSON object
             booking_data: json = json.loads(query)
 
-            cur.execute("SELECT user_id FROM users WHERE customer_name = %s", (booking_data['Customer Name'],))
+            cur.execute(
+                "SELECT user_id FROM users WHERE customer_name = %s",
+                (booking_data["Customer Name"],),
+            )
             # Gets the first element
             existing_user = cur.fetchone()
 
@@ -1624,13 +1725,15 @@ def p_cancel_command(p):
                         AND general_events.event_date = %s
                         AND general_events.start_time = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Event Name"],
-                         booking_data["Venue"],
-                         booking_data["Date"],
-                         booking_data["Time"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Event Name"],
+                            booking_data["Venue"],
+                            booking_data["Date"],
+                            booking_data["Time"],
+                        ],
+                    )
 
                     concert_ticket = cur.fetchone()
 
@@ -1646,10 +1749,11 @@ def p_cancel_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Cancelled",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Cancelled",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -1667,14 +1771,16 @@ def p_cancel_command(p):
                         AND transportation_tickets.departure_time = %s
                         AND transportation_tickets.departure_date = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Transportation Company"],
-                         booking_data["Departure Location"],
-                         booking_data["Arrival Location"],
-                         booking_data["Departure Time"],
-                         booking_data["Date"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Transportation Company"],
+                            booking_data["Departure Location"],
+                            booking_data["Arrival Location"],
+                            booking_data["Departure Time"],
+                            booking_data["Date"],
+                        ],
+                    )
 
                     concert_ticket = cur.fetchone()
 
@@ -1690,10 +1796,11 @@ def p_cancel_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Cancelled",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Cancelled",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -1711,14 +1818,16 @@ def p_cancel_command(p):
                         AND concert_tickets.event_date = %s 
                         AND concert_tickets.start_time = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Event Name"],
-                         booking_data["Venue"],
-                         booking_data["Location"],
-                         booking_data["Date"],
-                         booking_data["Time"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Event Name"],
+                            booking_data["Venue"],
+                            booking_data["Location"],
+                            booking_data["Date"],
+                            booking_data["Time"],
+                        ],
+                    )
 
                     concert_ticket = cur.fetchone()
 
@@ -1734,10 +1843,11 @@ def p_cancel_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Cancelled",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Cancelled",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -1756,14 +1866,16 @@ def p_cancel_command(p):
                         AND accommodations.check_out_date = %s
                         AND accommodations.check_in_time = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Property Name"],
-                         booking_data["Location"],
-                         booking_data["Check In Date"],
-                         booking_data["Check Out Date"],
-                         booking_data["Check In Time"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Property Name"],
+                            booking_data["Location"],
+                            booking_data["Check In Date"],
+                            booking_data["Check Out Date"],
+                            booking_data["Check In Time"],
+                        ],
+                    )
 
                     accommodation_ticket = cur.fetchone()
 
@@ -1779,10 +1891,11 @@ def p_cancel_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Cancelled",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Cancelled",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -1799,13 +1912,15 @@ def p_cancel_command(p):
                         AND sports_tickets.event_date = %s
                         AND sports_tickets.start_time = %s
                         """,
-                        [user_id,
-                         booking_data["Tickets Booked"],
-                         booking_data["Teams"],
-                         booking_data["Stadium"],
-                         booking_data["Date"],
-                         booking_data["Start Time"],
-                         ])
+                        [
+                            user_id,
+                            booking_data["Tickets Booked"],
+                            booking_data["Teams"],
+                            booking_data["Stadium"],
+                            booking_data["Date"],
+                            booking_data["Start Time"],
+                        ],
+                    )
 
                     sports_ticket = cur.fetchone()
 
@@ -1821,10 +1936,11 @@ def p_cancel_command(p):
                             WHERE booking_id = %s
                             AND user_id = %s
                             """,
-                            ["Cancelled",
-                             booking_id,
-                             user_id,
-                             ]
+                            [
+                                "Cancelled",
+                                booking_id,
+                                user_id,
+                            ],
                         )
 
                         neon_db.commit()
@@ -1853,9 +1969,9 @@ def p_cancel_command(p):
 def p_list_command(p):
     """
     list_command : KEYWORD_LIST AVAILABLE SCHEDULE FOR identifier_list SYM_END
-                
+
                 | KEYWORD_LIST AVAILABLE SCHEDULE FOR identifier_list FROM identifier_list TO identifier_list SYM_END
-                
+
                 | KEYWORD_LIST AVAILABLE TICKETS FOR identifier_list FROM identifier_list TO identifier_list SYM_END
 
                 | KEYWORD_LIST AVAILABLE TICKETS FOR CONCERT identifier_list IN identifier_list SYM_END
@@ -1863,15 +1979,15 @@ def p_list_command(p):
                 | KEYWORD_LIST AVAILABLE TICKETS FOR CONCERT identifier_list AT identifier_list SYM_END
 
                 | KEYWORD_LIST AVAILABLE TICKETS FOR identifier_list SYM_END
-                
+
                 | KEYWORD_LIST AVAILABLE TICKETS FOR identifier_list AT identifier_list SYM_END
 
                 | KEYWORD_LIST AVAILABLE ACCOMMODATIONS IN identifier_list SYM_END
-                
+
                 | KEYWORD_LIST AVAILABLE ROOMS FOR identifier_list IN identifier_list SYM_END
 
                 | KEYWORD_LIST AVAILABLE TICKETS FOR EVENT identifier_list IN identifier_list SYM_END
-                
+
                 | KEYWORD_LIST AVAILABLE TICKETS FOR EVENT identifier_list AT identifier_list SYM_END
     """
 
@@ -1950,7 +2066,7 @@ def p_list_command(p):
             For the price, also state the currency. i.e: $350 (JMD) or $350 (USD) 
         """
 
-        s = ' '.join(p[1:])
+        s = " ".join(p[1:])
 
         full_prompt = f"{system_prompt}\n\n{s}."
 
@@ -1958,106 +2074,185 @@ def p_list_command(p):
             model="gemini-2.0-flash", contents=full_prompt
         )
 
-        query = response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        query = (
+            response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        )
 
         result: json = json.loads(query)
 
         if len(result) == 0:
             print(f"No schedules found for {p[5]}.")
         else:
-            if result[0]['Ticket Type'] == 'General Ticket':
+            if result[0]["Ticket Type"] == "General Ticket":
                 data_list = []
 
                 for i in result:
                     # print(i)
-                    data = [i['Event Name'], i['Venue'], i['Date'], i['Start Time'], i['Price'], i['Available Tickets']]
+                    data = [
+                        i["Event Name"],
+                        i["Venue"],
+                        i["Date"],
+                        i["Start Time"],
+                        i["Price"],
+                        i["Available Tickets"],
+                    ]
 
                     data_list.append(data)
 
                 # Creating a table with headers and a grid format
                 table = tabulate(
                     data_list,
-                    headers=['Event Name', 'Venue', 'Date', 'Start Time', 'Price', 'Available Tickets'],
-                    tablefmt="grid"
+                    headers=[
+                        "Event Name",
+                        "Venue",
+                        "Date",
+                        "Start Time",
+                        "Price",
+                        "Available Tickets",
+                    ],
+                    tablefmt="grid",
                 )
 
                 print(table)
 
-            elif result[0]['Ticket Type'] == 'Concert Ticket':
+            elif result[0]["Ticket Type"] == "Concert Ticket":
                 data_list = []
 
                 for i in result:
                     # print(i)
-                    data = [i['Artist/Band'], i['Venue'], i['Location'], i['Date'], i['Start Time'], i['Price'],
-                            i['Available Tickets']]
+                    data = [
+                        i["Artist/Band"],
+                        i["Venue"],
+                        i["Location"],
+                        i["Date"],
+                        i["Start Time"],
+                        i["Price"],
+                        i["Available Tickets"],
+                    ]
 
                     data_list.append(data)
 
                 # Creating a table with headers and a grid format
                 table = tabulate(
                     data_list,
-                    headers=['Artist/Band', 'Venue', 'Location', 'Date', 'Start Time', 'Price', 'Available Tickets'],
-                    tablefmt="grid"
+                    headers=[
+                        "Artist/Band",
+                        "Venue",
+                        "Location",
+                        "Date",
+                        "Start Time",
+                        "Price",
+                        "Available Tickets",
+                    ],
+                    tablefmt="grid",
                 )
 
                 print(table)
 
-            elif result[0]['Ticket Type'] == 'Sports Ticket':
+            elif result[0]["Ticket Type"] == "Sports Ticket":
                 data_list = []
 
                 for i in result:
                     # print(i)
-                    data = [i['Teams'], i['Stadium'], i['Date'], i['Start Time'], i['Seat Location'], i['Price'],
-                            i['Available Tickets']]
+                    data = [
+                        i["Teams"],
+                        i["Stadium"],
+                        i["Date"],
+                        i["Start Time"],
+                        i["Seat Location"],
+                        i["Price"],
+                        i["Available Tickets"],
+                    ]
 
                     data_list.append(data)
 
                 # Creating a table with headers and a grid format
                 table = tabulate(
                     data_list,
-                    headers=['Teams', 'Stadium', 'Date', 'Start Time', 'Seat Location', 'Price', 'Available Tickets'],
-                    tablefmt="grid"
+                    headers=[
+                        "Teams",
+                        "Stadium",
+                        "Date",
+                        "Start Time",
+                        "Seat Location",
+                        "Price",
+                        "Available Tickets",
+                    ],
+                    tablefmt="grid",
                 )
 
                 print(table)
 
-            elif result[0]['Ticket Type'] == 'Accommodation Ticket':
+            elif result[0]["Ticket Type"] == "Accommodation Ticket":
                 data_list = []
 
                 for i in result:
                     # print(i)
-                    data = [i['Property Name'], i['Location'], i['Room Number'], i['Check-In Date'],
-                            i['Check-Out Date'],
-                            i['Room Type/Unit Type'], i['Price Per Night'], i['Available Rooms/Units']]
+                    data = [
+                        i["Property Name"],
+                        i["Location"],
+                        i["Room Number"],
+                        i["Check-In Date"],
+                        i["Check-Out Date"],
+                        i["Room Type/Unit Type"],
+                        i["Price Per Night"],
+                        i["Available Rooms/Units"],
+                    ]
 
                     data_list.append(data)
 
                 # Creating a table with headers and a grid format
                 table = tabulate(
                     data_list,
-                    headers=['Property Name', 'Location', 'Room Number', 'Check-In Date', 'Check-Out Date',
-                             'Room Type/Unit Type', 'Price Per Night', 'Available Rooms/Units'],
-                    tablefmt="grid"
+                    headers=[
+                        "Property Name",
+                        "Location",
+                        "Room Number",
+                        "Check-In Date",
+                        "Check-Out Date",
+                        "Room Type/Unit Type",
+                        "Price Per Night",
+                        "Available Rooms/Units",
+                    ],
+                    tablefmt="grid",
                 )
 
                 print(table)
 
-            elif result[0]['Ticket Type'] == 'Transportation Ticket':
+            elif result[0]["Ticket Type"] == "Transportation Ticket":
                 data_list = []
 
                 for i in result:
                     # print(i)
-                    data = [i['Provider'], i['Route'], i['Departure Date'], i['Departure Time'], i['Arrival Date'],
-                            i['Arrival Time'], i['Duration'], i['Price'], i['Available Seats']]
+                    data = [
+                        i["Provider"],
+                        i["Route"],
+                        i["Departure Date"],
+                        i["Departure Time"],
+                        i["Arrival Date"],
+                        i["Arrival Time"],
+                        i["Duration"],
+                        i["Price"],
+                        i["Available Seats"],
+                    ]
 
                     data_list.append(data)
 
                 # Creating a table with headers and a grid format
                 table = tabulate(
                     data_list,
-                    headers=['Provider', 'Route', 'Departure Date', 'Departure Time', 'Arrival Date', 'Arrival Time',
-                             'Duration', 'Price', 'Available Seats'],
-                    tablefmt="grid"
+                    headers=[
+                        "Provider",
+                        "Route",
+                        "Departure Date",
+                        "Departure Time",
+                        "Arrival Date",
+                        "Arrival Time",
+                        "Duration",
+                        "Price",
+                        "Available Seats",
+                    ],
+                    tablefmt="grid",
                 )
 
                 print(table)
@@ -2108,7 +2303,7 @@ def p_view_command(p):
         Parse the information in the following and return a JSON object with the information in the text that follows this.
         """
 
-        s = ' '.join(p[1:])
+        s = " ".join(p[1:])
 
         full_prompt = f"{system_prompt}\n\n{s}."
 
@@ -2116,13 +2311,18 @@ def p_view_command(p):
             model="gemini-2.0-flash", contents=full_prompt
         )
 
-        query = response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        query = (
+            response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        )
         # print(query)
 
         booking_details: json = json.loads(query)
         cur = neon_db.cursor()
 
-        cur.execute("SELECT user_id FROM users WHERE customer_name = %s", (booking_details['Customer Name'],))
+        cur.execute(
+            "SELECT user_id FROM users WHERE customer_name = %s",
+            (booking_details["Customer Name"],),
+        )
         # Gets the first element
         existing_user = cur.fetchone()
 
@@ -2146,8 +2346,10 @@ def p_view_command(p):
                     JOIN general_events ON bookings.booking_id = general_events.booking_id
                     WHERE bookings.user_id = %s
                     """,
-                    [user_id,
-                     ])
+                    [
+                        user_id,
+                    ],
+                )
 
                 general_tickets = cur.fetchall()
 
@@ -2167,9 +2369,16 @@ def p_view_command(p):
                     # Creating a table with headers and a grid format
                     table = tabulate(
                         data_list,
-                        headers=["Event Name", "Venue", "Event Date", "Start Time",
-                                 "Price", "Ticket Status", "Tickets Booked"],
-                        tablefmt="grid"
+                        headers=[
+                            "Event Name",
+                            "Venue",
+                            "Event Date",
+                            "Start Time",
+                            "Price",
+                            "Ticket Status",
+                            "Tickets Booked",
+                        ],
+                        tablefmt="grid",
                     )
 
                     print(table)
@@ -2188,8 +2397,10 @@ def p_view_command(p):
                     JOIN transportation_tickets ON bookings.booking_id = transportation_tickets.booking_id
                     WHERE bookings.user_id = %s
                     """,
-                    [user_id,
-                     ])
+                    [
+                        user_id,
+                    ],
+                )
 
                 transportation_tickets = cur.fetchall()
 
@@ -2209,9 +2420,17 @@ def p_view_command(p):
                     # Creating a table with headers and a grid format
                     table = tabulate(
                         data_list,
-                        headers=["Transportation Company", "Departure Location", "Arrival Location", "Departure Time",
-                                 "Departure Date", "Seat Number", "Ticket Status", "Tickets Booked"],
-                        tablefmt="grid"
+                        headers=[
+                            "Transportation Company",
+                            "Departure Location",
+                            "Arrival Location",
+                            "Departure Time",
+                            "Departure Date",
+                            "Seat Number",
+                            "Ticket Status",
+                            "Tickets Booked",
+                        ],
+                        tablefmt="grid",
                     )
 
                     print(table)
@@ -2232,8 +2451,10 @@ def p_view_command(p):
                     JOIN accommodations ON bookings.booking_id = accommodations.booking_id
                     WHERE bookings.user_id = %s
                     """,
-                    [user_id,
-                     ])
+                    [
+                        user_id,
+                    ],
+                )
 
                 accommodation_tickets = cur.fetchall()
 
@@ -2253,10 +2474,19 @@ def p_view_command(p):
                     # Creating a table with headers and a grid format
                     table = tabulate(
                         data_list,
-                        headers=["Property Name", "Location", "Room Number", "Check-in Date",
-                                 "Check-out Date", "Check-in Time", "Room Type/Unit Type", "Price Per Night",
-                                 "Ticket Status", "Tickets Booked"],
-                        tablefmt="grid"
+                        headers=[
+                            "Property Name",
+                            "Location",
+                            "Room Number",
+                            "Check-in Date",
+                            "Check-out Date",
+                            "Check-in Time",
+                            "Room Type/Unit Type",
+                            "Price Per Night",
+                            "Ticket Status",
+                            "Tickets Booked",
+                        ],
+                        tablefmt="grid",
                     )
 
                     print(table)
@@ -2276,8 +2506,10 @@ def p_view_command(p):
                     JOIN concert_tickets ON bookings.booking_id = concert_tickets.booking_id
                     WHERE bookings.user_id = %s
                     """,
-                    [user_id,
-                     ])
+                    [
+                        user_id,
+                    ],
+                )
 
                 concert_tickets = cur.fetchall()
 
@@ -2297,9 +2529,18 @@ def p_view_command(p):
                     # Creating a table with headers and a grid format
                     table = tabulate(
                         data_list,
-                        headers=["Event Name", "Venue", "Location", "Event Date", "Start Time", "Seat Number",
-                                 "Price", "Ticket Status", "Tickets Booked"],
-                        tablefmt="grid"
+                        headers=[
+                            "Event Name",
+                            "Venue",
+                            "Location",
+                            "Event Date",
+                            "Start Time",
+                            "Seat Number",
+                            "Price",
+                            "Ticket Status",
+                            "Tickets Booked",
+                        ],
+                        tablefmt="grid",
                     )
 
                     print(table)
@@ -2319,8 +2560,10 @@ def p_view_command(p):
                     JOIN sports_tickets ON bookings.booking_id = sports_tickets.booking_id
                     WHERE bookings.user_id = %s
                     """,
-                    [user_id,
-                     ])
+                    [
+                        user_id,
+                    ],
+                )
 
                 concert_tickets = cur.fetchall()
 
@@ -2340,9 +2583,18 @@ def p_view_command(p):
                     # Creating a table with headers and a grid format
                     table = tabulate(
                         data_list,
-                        headers=["Teams", "Stadium", "Event Date", "Start Time", "Seat Location", "Price",
-                                 "Seat Number", "Ticket Status", "Tickets Booked"],
-                        tablefmt="grid"
+                        headers=[
+                            "Teams",
+                            "Stadium",
+                            "Event Date",
+                            "Start Time",
+                            "Seat Location",
+                            "Price",
+                            "Seat Number",
+                            "Ticket Status",
+                            "Tickets Booked",
+                        ],
+                        tablefmt="grid",
                     )
 
                     print(table)
@@ -2392,7 +2644,7 @@ def p_history_command(p):
         Parse the information in the following and return a JSON object with the information in the text that follows this.
         """
 
-        s = ' '.join(p[1:])
+        s = " ".join(p[1:])
 
         full_prompt = f"{system_prompt}\n\n{s}."
 
@@ -2400,13 +2652,18 @@ def p_history_command(p):
             model="gemini-2.0-flash", contents=full_prompt
         )
 
-        query = response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        query = (
+            response.text.replace("```json", "").replace("```", "").strip("\n").strip()
+        )
         # print(query)
 
         booking_details: json = json.loads(query)
         cur = neon_db.cursor()
 
-        cur.execute("SELECT user_id FROM users WHERE customer_name = %s", (booking_details['Customer Name'],))
+        cur.execute(
+            "SELECT user_id FROM users WHERE customer_name = %s",
+            (booking_details["Customer Name"],),
+        )
         # Gets the first element
         existing_user = cur.fetchone()
 
@@ -2431,8 +2688,10 @@ def p_history_command(p):
                 JOIN general_events ON bookings.booking_id = general_events.booking_id
                 WHERE bookings.user_id = %s
                 """,
-                [user_id,
-                 ])
+                [
+                    user_id,
+                ],
+            )
 
             general_tickets = cur.fetchall()
 
@@ -2452,9 +2711,16 @@ def p_history_command(p):
                 # Creating a table with headers and a grid format
                 table = tabulate(
                     data_list,
-                    headers=["Event Name", "Venue", "Event Date", "Start Time",
-                             "Price", "Ticket Status", "Tickets Booked"],
-                    tablefmt="grid"
+                    headers=[
+                        "Event Name",
+                        "Venue",
+                        "Event Date",
+                        "Start Time",
+                        "Price",
+                        "Ticket Status",
+                        "Tickets Booked",
+                    ],
+                    tablefmt="grid",
                 )
 
                 print(table, "\n")
@@ -2475,8 +2741,10 @@ def p_history_command(p):
                 JOIN transportation_tickets ON bookings.booking_id = transportation_tickets.booking_id
                 WHERE bookings.user_id = %s
                 """,
-                [user_id,
-                 ])
+                [
+                    user_id,
+                ],
+            )
 
             transportation_tickets = cur.fetchall()
 
@@ -2496,9 +2764,17 @@ def p_history_command(p):
                 # Creating a table with headers and a grid format
                 table = tabulate(
                     data_list,
-                    headers=["Transportation Company", "Departure Location", "Arrival Location", "Departure Time",
-                             "Departure Date", "Seat Number", "Ticket Status", "Tickets Booked"],
-                    tablefmt="grid"
+                    headers=[
+                        "Transportation Company",
+                        "Departure Location",
+                        "Arrival Location",
+                        "Departure Time",
+                        "Departure Date",
+                        "Seat Number",
+                        "Ticket Status",
+                        "Tickets Booked",
+                    ],
+                    tablefmt="grid",
                 )
 
                 print(table, "\n")
@@ -2521,8 +2797,10 @@ def p_history_command(p):
                 JOIN accommodations ON bookings.booking_id = accommodations.booking_id
                 WHERE bookings.user_id = %s
                 """,
-                [user_id,
-                 ])
+                [
+                    user_id,
+                ],
+            )
 
             accommodation_tickets = cur.fetchall()
 
@@ -2542,10 +2820,19 @@ def p_history_command(p):
                 # Creating a table with headers and a grid format
                 table = tabulate(
                     data_list,
-                    headers=["Property Name", "Location", "Room Number", "Check-in Date",
-                             "Check-out Date", "Check-in Time", "Room Type/Unit Type", "Price Per Night",
-                             "Ticket Status", "Tickets Booked"],
-                    tablefmt="grid"
+                    headers=[
+                        "Property Name",
+                        "Location",
+                        "Room Number",
+                        "Check-in Date",
+                        "Check-out Date",
+                        "Check-in Time",
+                        "Room Type/Unit Type",
+                        "Price Per Night",
+                        "Ticket Status",
+                        "Tickets Booked",
+                    ],
+                    tablefmt="grid",
                 )
 
                 print(table, "\n")
@@ -2567,8 +2854,10 @@ def p_history_command(p):
                 JOIN concert_tickets ON bookings.booking_id = concert_tickets.booking_id
                 WHERE bookings.user_id = %s
                 """,
-                [user_id,
-                 ])
+                [
+                    user_id,
+                ],
+            )
 
             concert_tickets = cur.fetchall()
 
@@ -2588,9 +2877,18 @@ def p_history_command(p):
                 # Creating a table with headers and a grid format
                 table = tabulate(
                     data_list,
-                    headers=["Event Name", "Venue", "Location", "Event Date", "Start Time", "Seat Number",
-                             "Price", "Ticket Status", "Tickets Booked"],
-                    tablefmt="grid"
+                    headers=[
+                        "Event Name",
+                        "Venue",
+                        "Location",
+                        "Event Date",
+                        "Start Time",
+                        "Seat Number",
+                        "Price",
+                        "Ticket Status",
+                        "Tickets Booked",
+                    ],
+                    tablefmt="grid",
                 )
 
                 print(table, "\n")
@@ -2612,8 +2910,10 @@ def p_history_command(p):
                 JOIN sports_tickets ON bookings.booking_id = sports_tickets.booking_id
                 WHERE bookings.user_id = %s
                 """,
-                [user_id,
-                 ])
+                [
+                    user_id,
+                ],
+            )
 
             concert_tickets = cur.fetchall()
 
@@ -2633,9 +2933,18 @@ def p_history_command(p):
                 # Creating a table with headers and a grid format
                 table = tabulate(
                     data_list,
-                    headers=["Teams", "Stadium", "Event Date", "Start Time", "Seat Location", "Price",
-                             "Seat Number", "Ticket Status", "Tickets Booked"],
-                    tablefmt="grid"
+                    headers=[
+                        "Teams",
+                        "Stadium",
+                        "Event Date",
+                        "Start Time",
+                        "Seat Location",
+                        "Price",
+                        "Seat Number",
+                        "Ticket Status",
+                        "Tickets Booked",
+                    ],
+                    tablefmt="grid",
                 )
 
                 print(table, "\n")
@@ -2653,7 +2962,9 @@ def p_help_command(p):
     """
 
     if len(p) == 3:
-        p[0] = f"""
+        p[
+            0
+        ] = f"""
         book_command: hint - Book tickets for various events
             General events:
                 Book ticket for event <event_name> at <location> on <date> at <time> for <identifier>.
@@ -2812,7 +3123,7 @@ logging.basicConfig(
     level=logging.DEBUG,
     filename="parse-log.txt",
     filemode="w",
-    format="%(filename)10s:%(lineno)4d:%(message)s"
+    format="%(filename)10s:%(lineno)4d:%(message)s",
 )
 
 log = logging.getLogger()
@@ -2828,7 +3139,8 @@ def connect_to_neon_psycopg3():
         neon_db = psycopg.connect(DATABASE_URL)
         cur = neon_db.cursor()
 
-        cur.execute("""
+        cur.execute(
+            """
                     CREATE TABLE IF NOT EXISTS users (
                         user_id SERIAL PRIMARY KEY,
                         customer_name VARCHAR(255) NOT NULL
@@ -2899,7 +3211,8 @@ def connect_to_neon_psycopg3():
                         price VARCHAR(50),
                         seat_number VARCHAR(50)
                     );
-        """)
+        """
+        )
 
         neon_db.commit()
 
@@ -2923,11 +3236,11 @@ def main():
         if not s:
             continue
         elif s.lower() == "clear" or s.lower() == "cls":
-            if platform.system() == 'Linux':
+            if platform.system() == "Linux":
                 os.system("clear")
-            elif platform.system() == 'Windows':
+            elif platform.system() == "Windows":
                 os.system("cls")
-            elif platform.system() == 'Darwin':  # Mac
+            elif platform.system() == "Darwin":  # Mac
                 os.system("clear")
             print("Welcome to Swift Bookings (SB Version 1.0)\n")
             continue
